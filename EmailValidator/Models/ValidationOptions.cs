@@ -1,5 +1,7 @@
-namespace EmailValidator
+namespace EmailValidator.Models
 {
+    using System.Text.RegularExpressions;
+
     public class ValidationOptions
     {
         /// <summary>
@@ -33,5 +35,10 @@ namespace EmailValidator
         /// Validates the email domain against a common kept list of disposable email domains
         /// </summary>
         public bool ValidateDisposable { get; set; } = true;
+
+        /// <summary>
+        /// Input regex for email validation
+        /// </summary>
+        public Regex CustomRegex { get; set; }
     }
 }

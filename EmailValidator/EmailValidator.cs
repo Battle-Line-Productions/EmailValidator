@@ -1,5 +1,8 @@
 namespace EmailValidator
 {
+    using System;
+    using Models;
+
     public class EmailValidator
     {
         private readonly ValidationOptions _options;
@@ -13,7 +16,10 @@ namespace EmailValidator
         {
             _options = options;
         }
-        
-        public 
+
+        public EmailValidationResults Validate(string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

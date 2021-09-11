@@ -1,4 +1,4 @@
-namespace EmailValidator
+namespace EmailValidator.Models
 {
     public class ValidationResult
     {
