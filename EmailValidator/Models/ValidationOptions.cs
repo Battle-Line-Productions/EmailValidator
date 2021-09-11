@@ -40,5 +40,11 @@ namespace EmailValidator.Models
         /// Input regex for email validation
         /// </summary>
         public Regex CustomRegex { get; set; }
+
+        /// <summary>
+        /// If IsStrict is set to true then false will be returned in situations where email might still send successfully but isn't recommended.
+        /// Example: MX record is missing but A record exists would return false for IsValid even though spec says email might still send.
+        /// </summary>
+        public bool IsStrict { get; set; }
     }
 }
