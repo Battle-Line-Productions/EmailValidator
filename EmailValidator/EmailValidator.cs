@@ -1,6 +1,5 @@
 namespace EmailValidator
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Models;
@@ -22,7 +21,7 @@ namespace EmailValidator
 
         public EmailValidationResults Validate(string email)
         {
-            List<ValidationResult> results = new List<ValidationResult>();
+            var results = new List<ValidationResult>();
 
             if (_options.ValidateSimpleRegex)
             {
