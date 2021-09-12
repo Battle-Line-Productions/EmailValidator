@@ -2,6 +2,7 @@ namespace EmailValidator
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Models;
     using Validators;
 
@@ -12,11 +13,15 @@ namespace EmailValidator
         public EmailValidator()
         {
             _options = new ValidationOptions();
+            var dependencies = new BuildDependencies();
+            Task.Run(() => dependencies.CheckDependencies()).Wait();
         }
 
         public EmailValidator(ValidationOptions options)
         {
             _options = options;
+            var dependencies = new BuildDependencies();
+            Task.Run(() => dependencies.CheckDependencies()).Wait(); 
         }
 
         public EmailValidationResults Validate(string email)
@@ -37,6 +42,11 @@ namespace EmailValidator
             {
                 var dnsValidator = new DnsValidator(null, _options);
                 results.Add(dnsValidator.Query(email));
+            }
+
+            if (_options.ValidateDisposable)
+            {
+                results.Add(DisposableValidator.Validate(email));
             }
 
             return new EmailValidationResults

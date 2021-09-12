@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailValidator", "EmailValidator\EmailValidator.csproj", "{C8C4E1BE-FF7C-46A2-871F-7C679552CED9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{331F6254-6516-4813-B202-4F72D9ACDF0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{C8C4E1BE-FF7C-46A2-871F-7C679552CED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8C4E1BE-FF7C-46A2-871F-7C679552CED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8C4E1BE-FF7C-46A2-871F-7C679552CED9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

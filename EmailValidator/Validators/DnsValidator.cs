@@ -4,13 +4,20 @@ namespace EmailValidator.Validators
     using System.Linq;
     using DnsClient;
     using DnsClient.Protocol;
+    using Extensions;
     using Models;
 
     public class DnsValidator
     {
         private readonly ILookupClient _client;
         private readonly ValidationOptions _options;
-        
+
+
+        public DnsValidator(ValidationOptions options)
+        {
+            _options = options ?? new ValidationOptions();
+            _client = new LookupClient();
+        }
         public DnsValidator(ILookupClient client, ValidationOptions options)
         {
             _options = options ?? new ValidationOptions();
@@ -19,7 +26,7 @@ namespace EmailValidator.Validators
 
         public ValidationResult Query(string email)
         {
-            var domain = GetEmailDomain(email);
+            var domain = email.GetEmailDomain();
             IDnsQueryResponse lookupResult;
 
             try
@@ -45,7 +52,7 @@ namespace EmailValidator.Validators
                 RecordsFound = allMxAndARecords
             };
 
-            if (!mxRecords.Any() && aRecords.Any())
+            if (!mxRecords.Any())
             {
                 if (!aRecords.Any())
                 {
@@ -68,11 +75,6 @@ namespace EmailValidator.Validators
             response.Message = "Mx Record Exists";
             response.IsValid = true;
             return response;
-        }
-
-        private static string GetEmailDomain(string email)
-        {
-            return email.Split('@')[1];
         }
     }
 }

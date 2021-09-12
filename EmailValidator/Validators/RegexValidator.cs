@@ -22,8 +22,9 @@ namespace EmailValidator.Validators
         {
             var match = SimpleRegex.Match(email);
             return match.Success
-                ? new RegexValidationResult { IsValid = false, Message = "Email did not pass regex Validation", Captures = match.Captures}
-                : new RegexValidationResult { IsValid = true, Message = "Valid Email", Captures = match.Captures};
+                ? new RegexValidationResult { IsValid = true, Message = "Valid Email", Captures = match.Captures }
+                : new RegexValidationResult
+                    { IsValid = false, Message = "Email did not pass regex Validation", Captures = match.Captures };
         }
 
         /// <summary>
@@ -43,8 +44,9 @@ namespace EmailValidator.Validators
             
             var match = regex.Match(email);
             return match.Success
-                ? new RegexValidationResult { IsValid = false, Message = "Email did not pass regex Validation", Captures = match.Captures}
-                : new RegexValidationResult { IsValid = true, Message = "Valid Email", Captures = match.Captures};
+                ? new RegexValidationResult { IsValid = true, Message = "Valid Email", Captures = match.Captures }
+                : new RegexValidationResult
+                    { IsValid = false, Message = "Email did not pass regex Validation", Captures = match.Captures };
         }
     }
 }
