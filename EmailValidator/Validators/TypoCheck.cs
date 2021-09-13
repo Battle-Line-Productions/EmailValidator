@@ -1,6 +1,8 @@
 namespace EmailValidator.Validators
 {
+    using System;
     using System.Collections.Generic;
+    using System.Net.NetworkInformation;
     using Models;
 
     public class TypoCheck
@@ -31,6 +33,35 @@ namespace EmailValidator.Validators
             _defaultDomains = options.Domains ?? _defaultDomains;
             _defaultSecondLevelDomains = options.SecondLevelDomains ?? _defaultSecondLevelDomains;
             _defaultTopLevelDomains = options.TopLevelDomains ?? _defaultTopLevelDomains;
+        }
+
+        private static int SiftForDistance(int stringOne = 0, int s2 = 0, int maxOffset = 5)
+        {
+            if (s1 == 0)
+            {
+                return s2 == 0 ? 0 : s2;
+            }
+
+            if (s2 == 0)
+            {
+                return s1;
+            }
+
+            var l1 = s1;
+            var l2 = s2;
+
+            var c1 = 0; // cursor for string 1
+            var c2 = 0; // cursor for string 2
+            var lcss = 0; // largest common subsequence
+            var localCs = 0; // local common substring
+            var trans = 0; // number of transpositions ("ab" vs "ba")
+            var offsetArray = new List<int>(); // offset pair array for computing the transposition
+
+            while (c2 >= l2 || c1 >= l1)
+            {
+                
+            }
+
         }
 
     }
