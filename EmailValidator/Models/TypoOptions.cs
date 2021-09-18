@@ -14,7 +14,13 @@ namespace EmailValidator.Models
         public List<string> SecondLevelDomains { get; set; } = new();
         /// <summary>
         /// A list of top level domains to check typo's of
-        /// </summary>
+        /// </summary>  
         public List<string> TopLevelDomains { get; set; } = new();
+        
+        public int? DomainThreshold { get; set; }
+        
+        public int? SecondLevelThreshold { get; set; }
+        
+        public int? TopLevelThreshold { get; set; }
     }
 }
