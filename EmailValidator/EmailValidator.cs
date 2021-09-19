@@ -49,6 +49,12 @@ namespace EmailValidator
                 results.Add(DisposableValidator.Validate(email));
             }
 
+            if (_options.ValidateTypo)
+            {
+                var typo = new TypoCheck(_options.TypoOptions);
+                results.Add(typo.Suggest(email));
+            }
+
             return new EmailValidationResults
             {
                 IsValid = results.All(x => x.IsValid),

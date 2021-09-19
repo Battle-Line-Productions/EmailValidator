@@ -14,8 +14,10 @@
                 IsStrict = true,
                 ValidateRegex = true,
                 ValidateMx = true,
-                ValidateDisposable = true
+                ValidateDisposable = true,
+                ValidateTypo = true
             };
+            
             var validator = new EmailValidator(options);
 
             var result = validator.Validate("funkel1989@gmail.com");

@@ -46,5 +46,10 @@ namespace EmailValidator.Models
         /// Example: MX record is missing but A record exists would return false for IsValid even though spec says email might still send.
         /// </summary>
         public bool IsStrict { get; set; }
+
+        /// <summary>
+        /// A set of options used to determine how the typo functionality works
+        /// </summary>
+        public TypoOptions TypoOptions { get; set; }
     }
 }

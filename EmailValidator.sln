@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailValidator", "EmailVali
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{331F6254-6516-4813-B202-4F72D9ACDF0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{719BAC58-07FF-4659-BCBB-07296BE10849}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{331F6254-6516-4813-B202-4F72D9ACDF0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719BAC58-07FF-4659-BCBB-07296BE10849}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719BAC58-07FF-4659-BCBB-07296BE10849}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719BAC58-07FF-4659-BCBB-07296BE10849}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719BAC58-07FF-4659-BCBB-07296BE10849}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
