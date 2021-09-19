@@ -1,7 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>AdvancedEmailValidator</PackageId>
+        <Title>Advanced Email Validator</Title>
+        <Authors>Michael Cavanaugh</Authors>
+        <Description>Package allows for easy email validation. Includes the ability to validate email by Regex, check email's against a list of disposable email domains, validate if the email domain has an MX Record to receive email, and checks the email for typo's and then provides a suggested email if it feel it is typed wrong</Description>
+        <Copyright>2021</Copyright>
+        <PackageProjectUrl>https://github.com/Battle-Line-Productions/EmailValidator</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Battle-Line-Productions/EmailValidator</RepositoryUrl>
+        <RepositoryType>github</RepositoryType>
+        <PackageTags>email validator validation typo disposable dns mx record</PackageTags>
+        <Company>BattleLine Productions</Company>
+        <Product>Advanced Email Validator</Product>
+        <NeutralLanguage>en-US</NeutralLanguage>
         <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\EmailValidator.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
