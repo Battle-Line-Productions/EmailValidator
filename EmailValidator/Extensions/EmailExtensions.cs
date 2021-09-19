@@ -10,7 +10,7 @@ namespace EmailValidator.Extensions
             return email.Split("@")[1];
         }
 
-        public static (string, string, string, string) SplitEmail(this string email)
+        public static (string, string, string, string, string) SplitEmail(this string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -50,9 +50,9 @@ namespace EmailValidator.Extensions
                 }
             }
 
-            var address = string.Join("@", emailParts);
+            var fullAddress = string.Join("@", emailParts);
 
-            return (topLevelDomain, secondLevelDomain, domain, address);
+            return (topLevelDomain, secondLevelDomain, domain, emailParts[0], fullAddress);
         }
 
         public static string EncodeEmail(this string email)

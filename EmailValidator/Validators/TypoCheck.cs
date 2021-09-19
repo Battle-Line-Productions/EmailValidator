@@ -2,6 +2,7 @@ namespace EmailValidator.Validators
 {
     using System;
     using System.Collections.Generic;
+    using System.Net.NetworkInformation;
     using System.Text.RegularExpressions;
     using Extensions;
     using Models;
@@ -31,28 +32,28 @@ namespace EmailValidator.Validators
 
         public TypoCheck(TypoOptions options)
         {
-            _domains = options.Domains ?? _domains;
-            _secondLevelDomains = options.SecondLevelDomains ?? _secondLevelDomains;
-            _topLevelDomains = options.TopLevelDomains ?? _topLevelDomains;
-            _domainThreshold = options.DomainThreshold ?? _domainThreshold;
-            _secondLevelThreshold = options.SecondLevelThreshold ?? _secondLevelThreshold;
-            _topLevelThreshold = options.TopLevelThreshold ?? _topLevelThreshold;
+            _domains = options != null ? options.Domains ?? _domains : _domains;
+            _secondLevelDomains = options != null ? options.SecondLevelDomains ?? _secondLevelDomains : _secondLevelDomains;
+            _topLevelDomains = options != null ? options.TopLevelDomains ?? _topLevelDomains : _topLevelDomains;
+            _domainThreshold = options != null ? options.DomainThreshold ?? _domainThreshold : _domainThreshold;
+            _secondLevelThreshold = options != null ? options.SecondLevelThreshold ?? _secondLevelThreshold : _secondLevelThreshold;
+            _topLevelThreshold = options != null ? options.TopLevelThreshold ?? _topLevelThreshold : _topLevelThreshold;
         }
 
-        public ValidationResult Suggest(string email)
+        public TypoValidationResult Suggest(string email)
         {
             email = email.ToLower().EncodeEmail();
 
-            var (topLevelDomain, secondLevelDomain, domain, address) = email.SplitEmail();
+            var (topLevelDomain, secondLevelDomain, domain, localPart, fullAddress) = email.SplitEmail();
 
             if (_secondLevelDomains.Contains(secondLevelDomain) && _topLevelDomains.Contains(topLevelDomain))
             {
                 return new TypoValidationResult
                 {
                     IsValid = true,
-                    Address = address,
+                    Address = localPart,
                     Domain = domain,
-                    OriginalEmail = $"{address}@{domain}]",
+                    OriginalEmail = $"{localPart}@{domain}",
                     Message = "Provided email is valid"
                 };
             }
@@ -66,9 +67,9 @@ namespace EmailValidator.Validators
                     return new TypoValidationResult
                     {
                         IsValid = true,
-                        Address = address,
+                        Address = localPart,
                         Domain = domain,
-                        OriginalEmail = $"{address}@{domain}]",
+                        OriginalEmail = $"{localPart}@{domain}",
                         Message = "Provided email is valid"
                     };
                 }
@@ -76,9 +77,9 @@ namespace EmailValidator.Validators
                 return new TypoValidationResult
                 {
                     IsValid = false,
-                    Address = address,
+                    Address = localPart,
                     Domain = closestDomain,
-                    SuggestedEmail = $"{address}@{closestDomain}]",
+                    SuggestedEmail = $"{localPart}@{closestDomain}",
                     OriginalEmail = email,
                     Message = "Provided email was invalid. Suggestion Provided"
                 };
@@ -88,15 +89,16 @@ namespace EmailValidator.Validators
                 FindClosestDomain(secondLevelDomain, _secondLevelDomains, _secondLevelThreshold);
             var closestTopLevelDomain = FindClosestDomain(topLevelDomain, _topLevelDomains, _topLevelThreshold);
 
+            closestDomain = domain;
             var isTypo = false;
 
-            if (string.IsNullOrWhiteSpace(closestSecondLevelDomain) && closestSecondLevelDomain != secondLevelDomain)
+            if (!string.IsNullOrWhiteSpace(closestSecondLevelDomain) && closestSecondLevelDomain != secondLevelDomain)
             {
                 closestDomain = closestDomain?.Replace(secondLevelDomain, closestSecondLevelDomain);
                 isTypo = true;
             }
 
-            if (string.IsNullOrWhiteSpace(closestTopLevelDomain) && closestTopLevelDomain != topLevelDomain)
+            if (!string.IsNullOrWhiteSpace(closestTopLevelDomain) && closestTopLevelDomain != topLevelDomain && !string.IsNullOrEmpty(secondLevelDomain))
             {
                 // TODO: originally a regex was used on top level domain. Needs testing, might not be needed.
                 // TODO: closestDomain = closestDomain.replace(new RegExp(emailParts.topLevelDomain + "$"), closestTopLevelDomain);
@@ -109,9 +111,10 @@ namespace EmailValidator.Validators
                 return new TypoValidationResult
                 {
                     IsValid = true,
-                    Address = address,
+                    Address = localPart,
                     Domain = domain,
-                    OriginalEmail = $"{address}@{domain}]",
+                    OriginalEmail = $"{localPart}@{domain}",
+                    SuggestedEmail = $"{localPart}@{closestDomain}",
                     Message = "Provided email is valid"
                 };
             }
@@ -119,9 +122,9 @@ namespace EmailValidator.Validators
             return new TypoValidationResult
             {
                 IsValid = false,
-                Address = address,
+                Address = localPart,
                 Domain = closestDomain,
-                SuggestedEmail = $"{address}@{closestDomain}]",
+                SuggestedEmail = $"{localPart}@{closestDomain}",
                 OriginalEmail = email,
                 Message = "Provided email was invalid. Suggestion Provided"
             };
@@ -137,19 +140,19 @@ namespace EmailValidator.Validators
                 throw new ArgumentNullException(nameof(domain));
             }
 
-            foreach (var x in domains)
+            for (var i = 0; i < domains.Count; i++)
             {
-                if (domain == x)
+                if (domain == domains[i])
                 {
                     return domain;
                 }
 
-                var dist = SiftForDistance(domain, x);
-                
+                var dist = SiftForDistance(domain, domains[i]);
+
                 if (!(dist < minDist)) continue;
-                
+
                 minDist = dist;
-                closestDomain = x;
+                closestDomain = domains[i];
             }
 
             if (minDist <= threshold && closestDomain != null)
@@ -160,6 +163,7 @@ namespace EmailValidator.Validators
             return string.Empty;
         }
 
+        // https://siderite.dev/blog/super-fast-and-accurate-string-distance-sift3.html/
         private static double SiftForDistance(string s1, string s2, int maxOffset = 5)
         {
             if (string.IsNullOrWhiteSpace(s1))
@@ -172,8 +176,8 @@ namespace EmailValidator.Validators
                 return s1.Length;
             }
 
-            var l1 = s1;
-            var l2 = s2;
+            var l1 = s1.Length;
+            var l2 = s2.Length;
 
             var c1 = 0; // cursor for string 1
             var c2 = 0; // cursor for string 2
@@ -182,19 +186,19 @@ namespace EmailValidator.Validators
             var trans = 0; // number of transpositions ("ab" vs "ba")
             var offsetArray = new List<CursorPosition>(); // offset pair array for computing the transposition
 
-            while (c1 < l1.Length && c2 < l2.Length)
+            while (c1 < l1 && c2 < l2)
             {
                 if (s1[c1] == s2[c2])
                 {
                     localCs++;
                     var isTrans = false;
                     var i = 0;
-                    while (i <= offsetArray.Count)
+                    while (i < offsetArray.Count)
                     {
                         var ofs = offsetArray[i];
                         if (c1 <= ofs.CursorPosition1 || c2 <= ofs.CursorPosition2)
                         {
-                            isTrans = Math.Abs(c2 - c1) >= Math.Abs(ofs.CursorPosition1 - ofs.CursorPosition2);
+                            isTrans = Math.Abs(c2 - c1) >= Math.Abs(ofs.CursorPosition2 - ofs.CursorPosition1);
 
                             if (isTrans)
                             {
@@ -208,7 +212,6 @@ namespace EmailValidator.Validators
                                     trans++;
                                 }
                             }
-
                             break;
                         }
 
@@ -238,19 +241,20 @@ namespace EmailValidator.Validators
                         c1 = c2 = Math.Min(c1, c2);
                     }
 
-                    for (int j = 0; j < maxOffset && (c1 + j < l1.Length || c2 + j < l2.Length); j++)
+                    for (var j = 0; j < maxOffset && (c1 + j < l1 || c2 + j < l2); j++)
                     {
-                        if (c1 + j < l1.Length && (s1[c1 + j] == s2[c2]))
+                        if (c1 + j < l1 && s1[c1 + j] == s2[c2])
                         {
                             c1 += j - 1;
                             c2--;
                             break;
                         }
 
-                        if (c2 + j < l2.Length && (s1[c1] == s2[c2 + j]))
+                        if (c2 + j < l2 && s1[c1] == s2[c2 + j])
                         {
                             c1--;
                             c2 += j - 1;
+                            break;
                         }
                     }
                 }
@@ -258,7 +262,7 @@ namespace EmailValidator.Validators
                 c1++;
                 c2++;
 
-                if ((c1 >= l1.Length) || (c2 >= l2.Length))
+                if (c1 >= l1 || c2 >= l2)
                 {
                     lcss += localCs;
                     localCs = 0;
@@ -267,9 +271,8 @@ namespace EmailValidator.Validators
             }
 
             lcss += localCs;
-            return Math.Round((double)(Math.Max(l1.Length, l2.Length) - lcss + trans));
+            return Math.Round((double)(Math.Max(l1, l2) - lcss + trans));
         }
-
     }
 
     public sealed class CursorPosition
