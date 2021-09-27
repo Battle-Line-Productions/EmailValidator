@@ -8,7 +8,7 @@ namespace EmailValidator.Validators
         private static readonly Regex SimpleRegex = new("^[^\\s]+@[^\\s]+$", RegexOptions.IgnoreCase);
 
         private static readonly Regex Regex =
-            new("^[^-.;<>'\"\\s]+(\\.[^-.;<>'\"\\s]+)*@[^-.;<>'\"\\s]+(\\.[^-.;<>'\"\\s]+)*$", RegexOptions.IgnoreCase);
+            new(@"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", RegexOptions.IgnoreCase);
         
         /// <summary>
         /// Performs a very simple regex validation on email strings checking for the following
@@ -28,12 +28,7 @@ namespace EmailValidator.Validators
         }
 
         /// <summary>
-        /// Performs a regex validation using standard regex with the rules below or a custom regex defined by consumer
-        /// 1. At least one @ Sign
-        /// 2. string before the @ sign does not begin with a period, string after the @ sign does not begin with a period
-        /// 3. string before the @ sign will never contain two periods in a row, string after the @ sign will never contain two periods in a row
-        /// 4. No whitespace characters are contains in the section before or after the @ sign
-        /// 5. The email does not contain symbols ; < > ' "
+        /// Performs a regex validation or a custom regex defined by consumer
         /// </summary>
         /// <param name="email">the string to validate as an email</param>
         /// <param name="options">The options injected by the consumer to define how email validation should occur</param>

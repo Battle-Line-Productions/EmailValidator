@@ -15,6 +15,7 @@
         <Product>Advanced Email Validator</Product>
         <NeutralLanguage>en-US</NeutralLanguage>
         <TargetFramework>net5.0</TargetFramework>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
