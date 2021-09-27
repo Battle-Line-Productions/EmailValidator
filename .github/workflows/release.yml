@@ -7,23 +7,25 @@ on:
 jobs:
   publish:
     name: Publish
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+         
+    - name: Setup .NET Core @ Latest
+      uses: actions/setup-dotnet@v1
+      with:
+        source-url: https://api.nuget.org/v3/index.json
+        dotnet-version: '5.0'
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-
-      - name: Clean package cache as a temporary workaround for https://github.com/actions/setup-dotnet/issues/155
-        working-directory: ./
-        run: dotnet clean -c Release && dotnet nuget locals all --clear
-
-      - name: Pack
-        working-directory: ./
-        run: dotnet pack -c Release /p:version=${{ github.event.release.tag_name }} /p:ContinuousIntegrationBuild=true
-
-      - name: Publish to NuGet
-        working-directory: ./
-        run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Build Project
+      run: |
+        dotnet build EmailValidator --configuration Release
+    - name: Build solution and generate NuGet package
+      run: |  
+        cd EmailValidator
+        dotnet pack -c Release -o out /p:version=${{ github.event.release.tag_name }} /p:ContinuousIntegrationBuild=true
+    - name: Push generated package to NuGet registry
+      run: dotnet nuget push ./EmailValidator/out/*.nupkg -k ${{secrets.NUGET_API_KEY}} --skip-duplicate --no-symbols true
