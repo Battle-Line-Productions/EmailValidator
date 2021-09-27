@@ -30,18 +30,10 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
     steps:
       - uses: actions/checkout@v2
-      - name: Setup dotnet 2.1
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.1.x
-      - name: Setup dotnet 3.1
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
       - name: Setup dotnet 5.0
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.x
+          dotnet-version: 5.0.x
       - name: Clean package cache as a temporary workaround for https://github.com/actions/setup-dotnet/issues/155
         working-directory: ./
         run: dotnet clean -c Release && dotnet nuget locals all --clear
