@@ -39,4 +39,4 @@ jobs:
         run: dotnet clean -c Release && dotnet nuget locals all --clear
       - name: Test
         working-directory: ./
-        run: dotnet test --logger:trx --logger:GitHubActions
+        run: dotnet test --logger:trx
