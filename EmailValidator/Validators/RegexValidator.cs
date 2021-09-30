@@ -31,11 +31,11 @@ namespace EmailValidator.Validators
         /// Performs a regex validation or a custom regex defined by consumer
         /// </summary>
         /// <param name="email">the string to validate as an email</param>
-        /// <param name="options">The options injected by the consumer to define how email validation should occur</param>
+        /// <param name="customRegex">The the custom regex option injected by the consumer to define how email validation should occur</param>
         /// <returns><see cref="ValidationResult"/> containing a validation message and a boolean isValid</returns>
-        public static ValidationResult IsValid(string email, ValidationOptions options)
+        public static ValidationResult IsValid(string email, Regex customRegex = null)
         {
-            var regex = options.CustomRegex ?? Regex;
+            var regex = customRegex ?? Regex;
             
             var match = regex.Match(email);
             return match.Success

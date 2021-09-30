@@ -35,7 +35,7 @@ namespace EmailValidator
 
             if (_options.ValidateRegex)
             {
-                results.Add(RegexValidator.IsValid(email, _options));
+                results.Add(RegexValidator.IsValid(email, _options.CustomRegex));
             }
 
             if (_options.ValidateMx)
