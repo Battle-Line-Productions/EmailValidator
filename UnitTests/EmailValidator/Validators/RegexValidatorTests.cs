@@ -58,7 +58,7 @@
         [InlineData("ma@1hostname.com", true)]
         public void IsValid_IsCalledWithAnEmail_ReturnsValidationResponseSuccessfully(string email, bool isValid)
         {
-            var result = RegexValidator.IsValid(email, _options);
+            var result = RegexValidator.IsValid(email, _options.CustomRegex);
 
             Assert.Equal(isValid, result.IsValid);
         }

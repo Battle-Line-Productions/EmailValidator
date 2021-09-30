@@ -16,7 +16,7 @@ namespace EmailValidator
             await CheckDisposableFile();
         }
 
-        private async Task CheckDisposableFile()
+        private static async Task CheckDisposableFile()
         {
             if (!File.Exists(DisposableEmailFile))
             {
@@ -31,7 +31,7 @@ namespace EmailValidator
             }
         }
 
-        private async Task DownloadDisposableEmailFile()
+        private static async Task DownloadDisposableEmailFile()
         {
             using var client = new HttpClient();
             using var result = await client.GetAsync(DisposableEmailDomainUri);
