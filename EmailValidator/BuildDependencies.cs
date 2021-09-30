@@ -11,12 +11,12 @@ namespace EmailValidator
             "https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf";
         private static readonly string DisposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
 
-        public async Task CheckDependencies()
+        public static async Task CheckDependencies()
         {
             await CheckDisposableFile();
         }
 
-        private async Task CheckDisposableFile()
+        private static async Task CheckDisposableFile()
         {
             if (!File.Exists(DisposableEmailFile))
             {
@@ -31,7 +31,7 @@ namespace EmailValidator
             }
         }
 
-        private async Task DownloadDisposableEmailFile()
+        private static async Task DownloadDisposableEmailFile()
         {
             using var client = new HttpClient();
             using var result = await client.GetAsync(DisposableEmailDomainUri);

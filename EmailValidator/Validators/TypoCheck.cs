@@ -44,7 +44,7 @@ namespace EmailValidator.Validators
         {
             email = email.ToLower().EncodeEmail();
 
-            var (topLevelDomain, secondLevelDomain, domain, localPart, fullAddress) = email.SplitEmail();
+            var (topLevelDomain, secondLevelDomain, domain, localPart, _) = email.SplitEmail();
 
             if (_secondLevelDomains.Contains(secondLevelDomain) && _topLevelDomains.Contains(topLevelDomain))
             {
