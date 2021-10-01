@@ -24,7 +24,7 @@ namespace EmailValidator.Validators
             _client = client ?? new LookupClient();
         }
 
-        public ValidationResult Query(string email)
+        public ValidationResult<DnsValidationResult> Query(string email)
         {
             var domain = email.GetEmailDomain();
             IDnsQueryResponse lookupResult;
@@ -33,13 +33,12 @@ namespace EmailValidator.Validators
             {
                 lookupResult = _client.Query(domain, QueryType.ANY);
             }
-            catch (Exception e)
+            catch
             {
-                return new ValidationError
+                return new ValidationResult<DnsValidationResult>
                 {
                     Message = "Unable to validate Dns Due to an Error",
-                    ErrorMessage = e.Message,
-                    Exception = e
+                    IsValid = false
                 };
             }
             
@@ -47,9 +46,12 @@ namespace EmailValidator.Validators
             var mxRecords = lookupResult.Answers.Where(x => x.RecordType == ResourceRecordType.MX).ToList();
             var allMxAndARecords = aRecords.Concat(mxRecords).ToList();
 
-            var response = new DnsValidationResult
+            var response = new ValidationResult<DnsValidationResult>()
             {
-                RecordsFound = allMxAndARecords
+                ValidationDetails = new DnsValidationResult
+                {
+                    RecordsFound = allMxAndARecords
+                }
             };
 
             if (!mxRecords.Any())

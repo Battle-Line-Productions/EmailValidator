@@ -32,11 +32,11 @@ namespace UnitTests.EmailValidator.Validators
 
             var result = _typoCheck.Suggest(validEmail);
             
-            Assert.Null(result.SuggestedEmail);
+            Assert.Null(result.ValidationDetails.SuggestedEmail);
             Assert.True(result.IsValid);
-            Assert.Equal(validEmail, result.OriginalEmail);
-            Assert.Equal("email", result.Address);
-            Assert.Equal("msn.com", result.Domain);
+            Assert.Equal(validEmail, result.ValidationDetails.OriginalEmail);
+            Assert.Equal("email", result.ValidationDetails.Address);
+            Assert.Equal("msn.com", result.ValidationDetails.Domain);
             Assert.Equal("Provided email is valid", result.Message);
         }
         
@@ -47,11 +47,11 @@ namespace UnitTests.EmailValidator.Validators
 
             var result = _typoCheck.Suggest(invalidEmail);
             
-            Assert.Equal("email@msn.com", result.SuggestedEmail);
+            Assert.Equal("email@msn.com", result.ValidationDetails.SuggestedEmail);
             Assert.False(result.IsValid);
-            Assert.Equal(invalidEmail, result.OriginalEmail);
-            Assert.Equal("email", result.Address);
-            Assert.Equal("msn.com", result.Domain);
+            Assert.Equal(invalidEmail, result.ValidationDetails.OriginalEmail);
+            Assert.Equal("email", result.ValidationDetails.Address);
+            Assert.Equal("msn.com", result.ValidationDetails.Domain);
             Assert.Equal("Provided email was invalid. Suggestion Provided", result.Message);
         }
         
@@ -75,11 +75,11 @@ namespace UnitTests.EmailValidator.Validators
         {
             var result = _typoCheck.Suggest(invalidEmail);
             
-            Assert.Equal(correctedEmail, result.SuggestedEmail);
+            Assert.Equal(correctedEmail, result.ValidationDetails.SuggestedEmail);
             Assert.False(result.IsValid);
-            Assert.Equal(invalidEmail.ToLower(), result.OriginalEmail);
-            Assert.Equal(localPart, result.Address);
-            Assert.Equal(expectedDomainPart, result.Domain);
+            Assert.Equal(invalidEmail.ToLower(), result.ValidationDetails.OriginalEmail);
+            Assert.Equal(localPart, result.ValidationDetails.Address);
+            Assert.Equal(expectedDomainPart, result.ValidationDetails.Domain);
             Assert.Equal("Provided email was invalid. Suggestion Provided", result.Message);
         }
     }

@@ -2,8 +2,6 @@ namespace EmailValidator.Validators
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.NetworkInformation;
-    using System.Text.RegularExpressions;
     using Extensions;
     using Models;
 
@@ -40,7 +38,7 @@ namespace EmailValidator.Validators
             _topLevelThreshold = options != null ? options.TopLevelThreshold ?? _topLevelThreshold : _topLevelThreshold;
         }
 
-        public TypoValidationResult Suggest(string email)
+        public ValidationResult<TypoValidationResult> Suggest(string email)
         {
             email = email.ToLower().EncodeEmail();
 
@@ -48,13 +46,16 @@ namespace EmailValidator.Validators
 
             if (_secondLevelDomains.Contains(secondLevelDomain) && _topLevelDomains.Contains(topLevelDomain))
             {
-                return new TypoValidationResult
+                return new ValidationResult<TypoValidationResult>
                 {
                     IsValid = true,
-                    Address = localPart,
-                    Domain = domain,
-                    OriginalEmail = $"{localPart}@{domain}",
-                    Message = "Provided email is valid"
+                    Message = "Provided email is valid",
+                    ValidationDetails = new TypoValidationResult
+                    {
+                        Address = localPart,
+                        Domain = domain,
+                        OriginalEmail = $"{localPart}@{domain}",
+                    }
                 };
             }
 
@@ -64,24 +65,30 @@ namespace EmailValidator.Validators
             {
                 if (closestDomain == domain)
                 {
-                    return new TypoValidationResult
+                    return new ValidationResult<TypoValidationResult>
                     {
                         IsValid = true,
-                        Address = localPart,
-                        Domain = domain,
-                        OriginalEmail = $"{localPart}@{domain}",
-                        Message = "Provided email is valid"
+                        Message = "Provided email is valid",
+                        ValidationDetails = new TypoValidationResult
+                        {
+                            Address = localPart,
+                            Domain = domain,
+                            OriginalEmail = $"{localPart}@{domain}",
+                        }
                     };
                 }
 
-                return new TypoValidationResult
+                return new ValidationResult<TypoValidationResult>
                 {
                     IsValid = false,
-                    Address = localPart,
-                    Domain = closestDomain,
-                    SuggestedEmail = $"{localPart}@{closestDomain}",
-                    OriginalEmail = email,
-                    Message = "Provided email was invalid. Suggestion Provided"
+                    Message = "Provided email was invalid. Suggestion Provided",
+                    ValidationDetails = new TypoValidationResult
+                    {
+                        Address = localPart,
+                        Domain = closestDomain,
+                        SuggestedEmail = $"{localPart}@{closestDomain}",
+                        OriginalEmail = email,
+                    }
                 };
             }
 
@@ -108,25 +115,31 @@ namespace EmailValidator.Validators
 
             if (!isTypo)
             {
-                return new TypoValidationResult
+                return new ValidationResult<TypoValidationResult>
                 {
                     IsValid = true,
-                    Address = localPart,
-                    Domain = domain,
-                    OriginalEmail = $"{localPart}@{domain}",
-                    SuggestedEmail = $"{localPart}@{closestDomain}",
-                    Message = "Provided email is valid"
+                    Message = "Provided email is valid",
+                    ValidationDetails = new TypoValidationResult
+                    {
+                        Address = localPart,
+                        Domain = domain,
+                        OriginalEmail = $"{localPart}@{domain}",
+                        SuggestedEmail = $"{localPart}@{closestDomain}",
+                    }
                 };
             }
-            
-            return new TypoValidationResult
+
+            return new ValidationResult<TypoValidationResult>
             {
                 IsValid = false,
-                Address = localPart,
-                Domain = closestDomain,
-                SuggestedEmail = $"{localPart}@{closestDomain}",
-                OriginalEmail = email,
-                Message = "Provided email was invalid. Suggestion Provided"
+                Message = "Provided email was invalid. Suggestion Provided",
+                ValidationDetails = new TypoValidationResult
+                {
+                    Address = localPart,
+                    Domain = closestDomain,
+                    SuggestedEmail = $"{localPart}@{closestDomain}",
+                    OriginalEmail = email,
+                }
             };
         }
 

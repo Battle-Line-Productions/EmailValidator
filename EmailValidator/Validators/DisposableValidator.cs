@@ -20,18 +20,19 @@ namespace EmailValidator.Validators
             DisposableEmailListing.AddRange(File.ReadLines(DisposableEmailFile));
         }
 
-        public static ValidationResult Validate(string email)
+        public static ValidationResult<DisposableValidationResult> Validate(string email)
         {
             if (DisposableEmailListing.Contains(email.GetEmailDomain()))
             {
-                return new DisposableValidationResult
+
+                return new ValidationResult<DisposableValidationResult>
                 {
                     Message = "Email is on the list of disposable email domains",
                     IsValid = false
                 };
             }
             
-            return new DisposableValidationResult
+            return new ValidationResult<DisposableValidationResult>
             {
                 Message = "Email is not a disposable domain",
                 IsValid = true

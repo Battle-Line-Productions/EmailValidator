@@ -1,6 +1,6 @@
 namespace EmailValidator.Models
 {
-    public class DisposableValidationResult : ValidationResult
+    public class DisposableValidationResult
     {
         
     }

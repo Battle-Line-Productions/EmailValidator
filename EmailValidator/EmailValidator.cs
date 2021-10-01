@@ -1,7 +1,5 @@
 namespace EmailValidator
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Models;
     using Validators;
@@ -24,42 +22,22 @@ namespace EmailValidator
             Task.Run(() => dependencies.CheckDependencies()).Wait(); 
         }
 
-        public EmailValidationResults Validate(string email)
+        public (ValidationResult<RegexValidationResult>, 
+            ValidationResult<RegexValidationResult>,
+            ValidationResult<DnsValidationResult>, 
+            ValidationResult<DisposableValidationResult>, 
+            ValidationResult<TypoValidationResult>) Validate(string email)
         {
-            var results = new List<ValidationResult>();
+            var dnsValidator = new DnsValidator(null, _options);
+            var typo = new TypoCheck(_options.TypoOptions);
 
-            if (_options.ValidateSimpleRegex)
-            {
-                results.Add(RegexValidator.IsValidSimple(email));
-            }
+            var simpleRegexResult = _options.ValidateSimpleRegex ? RegexValidator.IsValidSimple(email) : null;
+            var standardRegexResult = _options.ValidateRegex ? RegexValidator.IsValid(email, _options.CustomRegex) : null;
+            var mxResult = _options.ValidateMx ? dnsValidator.Query(email) : null;
+            var disposableResult = _options.ValidateDisposable ? DisposableValidator.Validate(email) : null;
+            var typoResult = _options.ValidateTypo ? typo.Suggest(email) : null;
 
-            if (_options.ValidateRegex)
-            {
-                results.Add(RegexValidator.IsValid(email, _options.CustomRegex));
-            }
-
-            if (_options.ValidateMx)
-            {
-                var dnsValidator = new DnsValidator(null, _options);
-                results.Add(dnsValidator.Query(email));
-            }
-
-            if (_options.ValidateDisposable)
-            {
-                results.Add(DisposableValidator.Validate(email));
-            }
-
-            if (_options.ValidateTypo)
-            {
-                var typo = new TypoCheck(_options.TypoOptions);
-                results.Add(typo.Suggest(email));
-            }
-
-            return new EmailValidationResults
-            {
-                IsValid = results.All(x => x.IsValid),
-                ValidationResults = results
-            };
+            return (simpleRegexResult, standardRegexResult, mxResult, disposableResult, typoResult);
         }
     }
 }
