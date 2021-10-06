@@ -1,8 +1,8 @@
-namespace UnitTests.EmailValidator.Validators
+namespace UnitTests.AdvancedEmailValidator.Validators
 {
+    using global::AdvancedEmailValidator.Models;
+    using global::AdvancedEmailValidator.Validators;
     using System.Collections.Generic;
-    using global::EmailValidator.Models;
-    using global::EmailValidator.Validators;
     using Xunit;
 
     public class TypoCheckTests

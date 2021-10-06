@@ -1,4 +1,4 @@
-namespace EmailValidator.Models
+namespace AdvancedEmailValidator.Models
 {
     public class ValidationResult<T>
     {

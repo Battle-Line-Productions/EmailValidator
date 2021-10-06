@@ -1,7 +1,7 @@
-﻿namespace UnitTests.EmailValidator.Validators
+﻿namespace UnitTests.AdvancedEmailValidator.Validators
 {
-    using global::EmailValidator.Models;
-    using global::EmailValidator.Validators;
+    using global::AdvancedEmailValidator.Models;
+    using global::AdvancedEmailValidator.Validators;
     using Xunit;
 
     public class RegexValidatorTests

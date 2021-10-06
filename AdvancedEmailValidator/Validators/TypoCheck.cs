@@ -1,4 +1,4 @@
-namespace EmailValidator.Validators
+namespace AdvancedEmailValidator.Validators
 {
     using System;
     using System.Collections.Generic;

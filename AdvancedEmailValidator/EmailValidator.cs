@@ -1,4 +1,4 @@
-namespace EmailValidator
+namespace AdvancedEmailValidator
 {
     using System.Threading.Tasks;
     using Models;

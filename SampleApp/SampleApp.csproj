@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EmailValidator\EmailValidator.csproj" />
+      <ProjectReference Include="..\AdvancedEmailValidator\AdvancedEmailValidator.csproj" />
     </ItemGroup>
 
 </Project>
