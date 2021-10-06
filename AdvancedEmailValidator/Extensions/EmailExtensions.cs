@@ -1,4 +1,4 @@
-namespace EmailValidator.Extensions
+namespace AdvancedEmailValidator.Extensions
 {
     using System;
     using System.Linq;

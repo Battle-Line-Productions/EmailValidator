@@ -1,4 +1,4 @@
-namespace EmailValidator.Validators
+namespace AdvancedEmailValidator.Validators
 {
     using System.Text.RegularExpressions;
     using Models;

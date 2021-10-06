@@ -1,8 +1,8 @@
 ﻿namespace SampleApp
 {
     using System;
-    using EmailValidator;
-    using EmailValidator.Models;
+    using AdvancedEmailValidator;
+    using AdvancedEmailValidator.Models;
 
     static class Program
     {

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailValidator", "EmailValidator\EmailValidator.csproj", "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedEmailValidator", "AdvancedEmailValidator\AdvancedEmailValidator.csproj", "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApp", "SampleApp\SampleApp.csproj", "{331F6254-6516-4813-B202-4F72D9ACDF0D}"
 EndProject

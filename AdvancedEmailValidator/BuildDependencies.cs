@@ -1,4 +1,4 @@
-namespace EmailValidator
+namespace AdvancedEmailValidator
 {
     using System;
     using System.IO;
