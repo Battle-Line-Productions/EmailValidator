@@ -25,7 +25,7 @@ jobs:
         dotnet build AdvancedEmailValidator --configuration Release
     - name: Build solution and generate NuGet package
       run: |  
-        cd EmailValidator
+        cd AdvancedEmailValidator
         dotnet pack -c Release -o out /p:version=${{ github.event.release.tag_name }} /p:ContinuousIntegrationBuild=true
     - name: Push generated package to NuGet registry
       run: dotnet nuget push ./AdvancedEmailValidator/out/*.nupkg -k ${{secrets.NUGET_API_KEY}} --skip-duplicate --no-symbols true
