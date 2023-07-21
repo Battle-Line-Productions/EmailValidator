@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyName>AdvancedEmailValidator</AssemblyName>
     <ProjectGuid>FAE04EC0-301F-11D3-BF4B-00C04F79EFBC</ProjectGuid>
-    <TargetFramework>netstandard2.1</TargetFramework>
     <Version>1.0.0</Version>
     <RootNamespace>AdvancedEmailValidator</RootNamespace>
     <SignAssembly Condition="'$(ShouldSignAssembly)' == 'true'">true</SignAssembly>
@@ -23,7 +22,7 @@
         <Company>BattleLine Productions</Company>
         <Product>Advanced Email Validator</Product>
         <NeutralLanguage>en-US</NeutralLanguage>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
@@ -36,7 +35,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="DnsClient" Version="1.5.0" />
+      <PackageReference Include="DnsClient" Version="1.7.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Interfaces\" />
     </ItemGroup>
 
 </Project>

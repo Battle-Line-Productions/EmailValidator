@@ -1,5 +1,4 @@
 ﻿#region Copyright
-
 // ---------------------------------------------------------------------------
 // Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
 // 
@@ -10,17 +9,16 @@
 // Company: BattleLine Productions LLC
 // Date: 07/20/2023
 // Project: Frontline CRM
-// File: ValidationType.cs
+// File: IDnsValidator.cs
 // ---------------------------------------------------------------------------
-
 #endregion
 
-namespace AdvancedEmailValidator.Models;
+using AdvancedEmailValidator.Models;
+using System.Threading.Tasks;
 
-public enum ValidationType
+namespace AdvancedEmailValidator.Interfaces;
+
+public interface IDnsValidator
 {
-    RegexValidation,
-    TypoValidation,
-    DisposableValidation,
-    MxValidation
+    Task<ValidationResult<DnsValidationResult>> QueryAsync(string email);
 }

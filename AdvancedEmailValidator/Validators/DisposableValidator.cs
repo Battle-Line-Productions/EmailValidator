@@ -1,42 +1,62 @@
-namespace AdvancedEmailValidator.Validators
+#region Copyright
+
+// ---------------------------------------------------------------------------
+// Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
+// 
+// Licensed under the BattleLine Productions LLC license agreement.
+// See LICENSE file in the project root for full license information.
+// 
+// Author: Michael Cavanaugh
+// Company: BattleLine Productions LLC
+// Date: 07/20/2023
+// Project: Frontline CRM
+// File: DisposableValidator.cs
+// ---------------------------------------------------------------------------
+
+#endregion
+
+#region Usings
+
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using AdvancedEmailValidator.Extensions;
+using AdvancedEmailValidator.Interfaces;
+using AdvancedEmailValidator.Models;
+
+#endregion
+
+namespace AdvancedEmailValidator.Validators;
+
+public class DisposableValidator  :IDisposableValidator
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using Extensions;
-    using Models;
+    private readonly string _disposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
 
-    public static class DisposableValidator
+    public DisposableValidator()
     {
-        private static readonly List<string> DisposableEmailListing = new();
-        private static readonly string DisposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
-
-        static DisposableValidator()
+        if (!File.Exists(_disposableEmailFile))
         {
-            if (!File.Exists(DisposableEmailFile))
-            {
-                throw new FileNotFoundException(nameof(DisposableEmailFile));
-            }
-
-            DisposableEmailListing.AddRange(File.ReadLines(DisposableEmailFile));
+            throw new FileNotFoundException(nameof(_disposableEmailFile));
         }
+    }
 
-        public static ValidationResult<DisposableValidationResult> Validate(string email)
+    public async Task<ValidationResult<DisposableValidationResult>> ValidateAsync(string email)
+    {
+        var disposableEmailListing = await File.ReadAllLinesAsync(_disposableEmailFile);
+
+        if (Array.Exists(disposableEmailListing, line => line.Equals(email.GetEmailDomain(), StringComparison.OrdinalIgnoreCase)))
         {
-            if (DisposableEmailListing.Contains(email.GetEmailDomain()))
-            {
-
-                return new ValidationResult<DisposableValidationResult>
-                {
-                    Message = "Email is on the list of disposable email domains",
-                    IsValid = false
-                };
-            }
-            
             return new ValidationResult<DisposableValidationResult>
             {
-                Message = "Email is not a disposable domain",
-                IsValid = true
+                Message = "Email is on the list of disposable email domains",
+                IsValid = false
             };
         }
+
+        return new ValidationResult<DisposableValidationResult>
+        {
+            Message = "Email is not a disposable domain",
+            IsValid = true
+        };
     }
 }
