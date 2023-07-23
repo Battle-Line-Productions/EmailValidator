@@ -54,6 +54,8 @@ public class TypoCheck : ITypoCheck
 
     private readonly int _topLevelThreshold = 2;
 
+    private const int DefaultMaxOffset = 5;
+
     public TypoCheck(TypoOptions options)
     {
         _domains ??= options?.Domains ?? _domains;
@@ -66,7 +68,7 @@ public class TypoCheck : ITypoCheck
 
     public Task<ValidationResult<TypoValidationResult>> SuggestAsync(string email)
     {
-        email = email.ToLower().EncodeEmail();
+        email = email.ToLower();
 
         var (topLevelDomain, secondLevelDomain, domain, localPart, _) = email.SplitEmail();
 
@@ -187,7 +189,7 @@ public class TypoCheck : ITypoCheck
                 return domain;
             }
 
-            var dist = SiftForDistance(domain, domains[i]);
+            var dist = CalculateSiftDistance(domain, domains[i]);
 
             if (!(dist < minDist)) continue;
 
@@ -204,118 +206,131 @@ public class TypoCheck : ITypoCheck
     }
 
     // https://siderite.dev/blog/super-fast-and-accurate-string-distance-sift3.html/
-    private static double CalculateSiftDistance(string string1, string string2, int maxOffset = 5)
+    private static double CalculateSiftDistance(string sourceString, string targetString, int maxOffset = DefaultMaxOffset)
     {
-        if (string.IsNullOrWhiteSpace(string1))
+        if (string.IsNullOrWhiteSpace(sourceString))
         {
-            return string.IsNullOrWhiteSpace(string2) ? 0 : string2.Length;
+            return string.IsNullOrWhiteSpace(targetString) ? 0 : targetString.Length;
         }
 
-        if (string.IsNullOrWhiteSpace(string2))
+        if (string.IsNullOrWhiteSpace(targetString))
         {
-            return string1.Length;
+            return sourceString.Length;
         }
 
-        var length1 = string1.Length;
-        var length2 = string2.Length;
+        var sourceLength = sourceString.Length;
+        var targetLength = targetString.Length;
 
-        var cursor1 = 0; // cursor for string 1
-        var cursor2 = 0; // cursor for string 2
-        var largestCommonSubsequence = 0; // largest common subsequence
-        var localCommonSubstring = 0; // local common substring
-        var transpositions = 0; // number of transpositions ("ab" vs "ba")
-        var offsetPairs = new List<CursorPosition>(); // offset pair array for computing the transposition
+        var sourceCursor = 0;
+        var targetCursor = 0;
+        var largestCommonSubsequence = 0;
+        var localCommonSubstring = 0;
+        var transpositions = 0;
+        var offsetPairs = new List<CursorPosition>();
 
-        while (cursor1 < length1 && cursor2 < length2)
+        while (sourceCursor < sourceLength && targetCursor < targetLength)
         {
-            if (string1[cursor1] == string2[cursor2])
+            if (sourceString[sourceCursor] == targetString[targetCursor])
             {
                 localCommonSubstring++;
-                var isTransposition = false;
-                var i = 0;
-                while (i < offsetPairs.Count)
-                {
-                    var offsetPair = offsetPairs[i];
-                    if (cursor1 <= offsetPair.CursorPosition1 || cursor2 <= offsetPair.CursorPosition2)
-                    {
-                        isTransposition = Math.Abs(cursor2 - cursor1) >= Math.Abs(offsetPair.CursorPosition2 - offsetPair.CursorPosition1);
-
-                        if (isTransposition)
-                        {
-                            transpositions++;
-                        }
-                        else if (!offsetPair.IsTrans)
-                        {
-                            offsetPair.IsTrans = true;
-                            transpositions++;
-                        }
-
-                        break;
-                    }
-
-                    if (cursor1 > offsetPair.CursorPosition2 && cursor2 > offsetPair.CursorPosition1)
-                    {
-                        offsetPairs.RemoveAt(i);
-                    }
-                    else
-                    {
-                        i++;
-                    }
-                }
-
-                offsetPairs.Add(new CursorPosition
-                {
-                    CursorPosition1 = cursor1,
-                    CursorPosition2 = cursor2,
-                    IsTrans = isTransposition
-                });
+                ProcessMatchingCharacters();
             }
             else
             {
                 largestCommonSubsequence += localCommonSubstring;
                 localCommonSubstring = 0;
-                if (cursor1 != cursor2)
-                {
-                    cursor1 = cursor2 = Math.Min(cursor1, cursor2);
-                }
-
-                for (var j = 0; j < maxOffset && (cursor1 + j < length1 || cursor2 + j < length2); j++)
-                {
-                    if (cursor1 + j < length1 && string1[cursor1 + j] == string2[cursor2])
-                    {
-                        cursor1 += j - 1;
-                        cursor2--;
-                        break;
-                    }
-
-                    if (cursor2 + j < length2 && string1[cursor1] == string2[cursor2 + j])
-                    {
-                        cursor1--;
-                        cursor2 += j - 1;
-                        break;
-                    }
-                }
+                AdjustCursorsForNonMatchingCharacters();
             }
 
-            cursor1++;
-            cursor2++;
+            sourceCursor++;
+            targetCursor++;
 
-            if (cursor1 >= length1 || cursor2 >= length2)
+            if (sourceCursor >= sourceLength || targetCursor >= targetLength)
             {
                 largestCommonSubsequence += localCommonSubstring;
                 localCommonSubstring = 0;
-                cursor1 = cursor2 = Math.Min(cursor1, cursor2);
+                sourceCursor = targetCursor = Math.Min(sourceCursor, targetCursor);
             }
         }
 
         largestCommonSubsequence += localCommonSubstring;
-        return Math.Round((double)(Math.Max(length1, length2) - largestCommonSubsequence + transpositions));
+        return Math.Round((double)(Math.Max(sourceLength, targetLength) - largestCommonSubsequence + transpositions));
+
+        void ProcessMatchingCharacters()
+        {
+            var isTransposition = false;
+            var i = 0;
+            while (i < offsetPairs.Count)
+            {
+                var offsetPair = offsetPairs[i];
+                if (sourceCursor <= offsetPair.SourcePosition || targetCursor <= offsetPair.TargetPosition)
+                {
+                    isTransposition = Math.Abs(targetCursor - sourceCursor) >= Math.Abs(offsetPair.TargetPosition - offsetPair.SourcePosition);
+
+                    if (isTransposition)
+                    {
+                        transpositions++;
+                    }
+                    else
+                    {
+                        if (!offsetPair.IsTransposition)
+                        {
+                            offsetPair.IsTransposition = true;
+                            transpositions++;
+                        }
+                    }
+
+                    break;
+                }
+
+                if (sourceCursor > offsetPair.TargetPosition && targetCursor > offsetPair.SourcePosition)
+                {
+                    offsetPairs.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+
+            offsetPairs.Add(new CursorPosition
+            {
+                SourcePosition = sourceCursor,
+                TargetPosition = targetCursor,
+                IsTransposition = isTransposition
+            });
+        }
+
+        void AdjustCursorsForNonMatchingCharacters()
+        {
+            if (sourceCursor != targetCursor)
+            {
+                sourceCursor = targetCursor = Math.Min(sourceCursor, targetCursor);
+            }
+
+            for (var j = 0; j < maxOffset && (sourceCursor + j < sourceLength || targetCursor + j < targetLength); j++)
+            {
+                if (sourceCursor + j < sourceLength && sourceString[sourceCursor + j] == targetString[targetCursor])
+                {
+                    sourceCursor += j - 1;
+                    targetCursor--;
+                    break;
+                }
+
+                if (targetCursor + j < targetLength && sourceString[sourceCursor] == targetString[targetCursor + j])
+                {
+                    sourceCursor--;
+                    targetCursor += j - 1;
+                    break;
+                }
+            }
+        }
     }
 }
 
 public sealed class CursorPosition
 {
-    public int CursorPosition1 { get; set; }
-    public int CursorPosition2 { get; set; }
-    public bool IsTrans { get; set; }
+    public int SourcePosition { get; set; }
+    public int TargetPosition { get; set; }
+    public bool IsTransposition { get; set; }
 }

@@ -26,6 +26,7 @@ public static class EmailValidatorServiceCollectionExtensions
     {
         services.AddSingleton<ILookupClient, LookupClient>();
 
+        services.AddScoped<IFileReader, FileReader>();
         services.AddScoped<IBuildDependencies, BuildDependencies>();
         services.AddScoped<IDnsValidator, DnsValidator>();
         services.AddScoped<ITypoCheck, TypoCheck>();

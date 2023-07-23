@@ -28,13 +28,17 @@ using AdvancedEmailValidator.Models;
 
 namespace AdvancedEmailValidator.Validators;
 
-public class DisposableValidator  :IDisposableValidator
+public class DisposableValidator : IDisposableValidator
 {
+    private readonly IFileReader _fileReader;
     private readonly string _disposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
 
-    public DisposableValidator()
+
+    public DisposableValidator(IFileReader fileReader)
     {
-        if (!File.Exists(_disposableEmailFile))
+        _fileReader = fileReader;
+
+        if (!_fileReader.Exists(_disposableEmailFile))
         {
             throw new FileNotFoundException(nameof(_disposableEmailFile));
         }
@@ -42,7 +46,7 @@ public class DisposableValidator  :IDisposableValidator
 
     public async Task<ValidationResult<DisposableValidationResult>> ValidateAsync(string email)
     {
-        var disposableEmailListing = await File.ReadAllLinesAsync(_disposableEmailFile);
+        var disposableEmailListing = await _fileReader.ReadAllLinesAsync(_disposableEmailFile);
 
         if (Array.Exists(disposableEmailListing, line => line.Equals(email.GetEmailDomain(), StringComparison.OrdinalIgnoreCase)))
         {

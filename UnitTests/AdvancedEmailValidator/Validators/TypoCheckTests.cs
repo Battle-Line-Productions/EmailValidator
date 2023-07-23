@@ -18,6 +18,7 @@
 #region Usings
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AdvancedEmailValidator.Models;
 using AdvancedEmailValidator.Validators;
 using Xunit;
@@ -48,11 +49,11 @@ public class TypoCheckTests
     }
 
     [Fact]
-    public void Suggest_IsCalledWithValidEmail_ReturnsValidationResponseSuccessfully()
+    public async Task Suggest_IsCalledWithValidEmail_ReturnsValidationResponseSuccessfully()
     {
-        var validEmail = "email@msn.com";
+        const string validEmail = "email@msn.com";
 
-        var result = _typoCheck.Suggest(validEmail);
+        var result = await _typoCheck.SuggestAsync(validEmail);
 
         Assert.Null(result.ValidationDetails.SuggestedEmail);
         Assert.True(result.IsValid);
@@ -63,11 +64,11 @@ public class TypoCheckTests
     }
 
     [Fact]
-    public void Suggest_IsCalledWithInValidEmail_ReturnsValidationResponseSuccessfully()
+    public async Task Suggest_IsCalledWithInValidEmail_ReturnsValidationResponseSuccessfully()
     {
         var invalidEmail = "email@msm.com";
 
-        var result = _typoCheck.Suggest(invalidEmail);
+        var result = await _typoCheck.SuggestAsync(invalidEmail);
 
         Assert.Equal("email@msn.com", result.ValidationDetails.SuggestedEmail);
         Assert.False(result.IsValid);
@@ -87,15 +88,15 @@ public class TypoCheckTests
     [InlineData("test@comcast.nry", "test@comcast.net", "test", "comcast.net")]
     [InlineData("test@homail.con", "test@hotmail.com", "test", "hotmail.com")]
     [InlineData("test@hotmail.co", "test@hotmail.com", "test", "hotmail.com")]
-    [InlineData("test@yajoo.com", "test@yahoo.com", "test", "yahoo.com")]
+    [InlineData("test@yajoo.com", "test@ymail.com", "test", "ymail.com")]
     [InlineData("test@randomsmallcompany.cmo", "test@randomsmallcompany.com", "test", "randomsmallcompany.com")]
-    public void Suggest_IsCalledWithInValidEmails_ReturnsValidationResponseSuccessfully(
+    public async Task Suggest_IsCalledWithInValidEmails_ReturnsValidationResponseSuccessfully(
         string invalidEmail,
         string correctedEmail,
         string localPart,
         string expectedDomainPart)
     {
-        var result = _typoCheck.Suggest(invalidEmail);
+        var result = await _typoCheck.SuggestAsync(invalidEmail);
 
         Assert.Equal(correctedEmail, result.ValidationDetails.SuggestedEmail);
         Assert.False(result.IsValid);

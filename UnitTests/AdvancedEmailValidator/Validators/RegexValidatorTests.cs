@@ -17,8 +17,10 @@
 
 #region Usings
 
-using AdvancedEmailValidator.Models;
+using AdvancedEmailValidator.Interfaces;
 using AdvancedEmailValidator.Validators;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 #endregion
@@ -27,14 +29,11 @@ namespace UnitTests.AdvancedEmailValidator.Validators;
 
 public class RegexValidatorTests
 {
-    private readonly ValidationOptions _options;
+    private readonly IRegexValidator _regexValidator;
 
     public RegexValidatorTests()
     {
-        _options = new ValidationOptions
-        {
-            CustomRegex = null
-        };
+        _regexValidator = new RegexValidator();
     }
 
     [Theory]
@@ -77,10 +76,58 @@ public class RegexValidatorTests
     [InlineData("ma-a@1hostname.com", true)]
     [InlineData("ma.a@1hostname.com", true)]
     [InlineData("ma@1hostname.com", true)]
-    public void IsValid_IsCalledWithAnEmail_ReturnsValidationResponseSuccessfully(string email, bool isValid)
+    public async Task IsValid_IsCalledWithAnEmail_ReturnsValidationResponseSuccessfully(string email, bool isValid)
     {
-        var result = RegexValidator.IsValid(email, _options.CustomRegex);
+        var result = await _regexValidator.IsValidAsync(email, null);
 
         Assert.Equal(isValid, result.IsValid);
+    }
+
+    [Fact]
+    public async Task IsValid_EmailIsEmpty_ReturnsFalse()
+    {
+        var result = await _regexValidator.IsValidSimpleAsync("");
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public async Task IsValid_EmailIsNull_ThrowsArgumentNullException()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _regexValidator.IsValidSimpleAsync(null));
+    }
+
+    [Fact]
+    public async Task IsValid_EmailIsWhitespace_ReturnsFalse()
+    {
+        var result = await _regexValidator.IsValidSimpleAsync(" ");
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public async Task IsValid_EmailHasNoAtSymbol_ReturnsFalse()
+    {
+        var result = await _regexValidator.IsValidSimpleAsync("email.com");
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public async Task IsValid_EmailHasNoDomain_ReturnsFalse()
+    {
+        var result = await _regexValidator.IsValidSimpleAsync("email@");
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public async Task IsValid_EmailHasNoUsername_ReturnsFalse()
+    {
+        var result = await _regexValidator.IsValidSimpleAsync("@domain.com");
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public async Task IsValid_EmailIsValid_ReturnsTrue()
+    {
+        var result = await _regexValidator.IsValidSimpleAsync("email@domain.com");
+        Assert.True(result.IsValid);
     }
 }
