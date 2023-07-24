@@ -28,11 +28,17 @@ public static class EmailExtensions
 {
     public static string GetEmailDomain(this string email)
     {
-        var parts = email.Split("@");
+        var parts = email.Split("@", StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length != 2)
         {
             throw new ArgumentException($"{email} is not a valid email");
+        }
+
+        var domainParts = parts[1].Split(".", StringSplitOptions.RemoveEmptyEntries);
+        if (domainParts.Length < 2)
+        {
+            throw new ArgumentException($"The domain in {email} is not valid");
         }
 
         return parts[1];
@@ -49,7 +55,7 @@ public static class EmailExtensions
 
         var emailParts = email.Split("@");
 
-        if (emailParts.Length != 2 || email.Any(x => string.IsNullOrWhiteSpace(x.ToString())))
+        if (emailParts.Length != 2 || email.Any(x => string.IsNullOrWhiteSpace(x.ToString())) || emailParts[1].StartsWith("."))
         {
             throw new ArgumentException($"{email} is not a valid email");
         }

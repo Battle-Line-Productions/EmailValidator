@@ -25,4 +25,8 @@
       <ProjectReference Include="..\AdvancedEmailValidator\AdvancedEmailValidator.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="AdvancedEmailValidator\Extensions\" />
+    </ItemGroup>
+
 </Project>
