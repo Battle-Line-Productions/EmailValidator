@@ -1,5 +1,4 @@
 ﻿#region Copyright
-
 // ---------------------------------------------------------------------------
 // Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
 // 
@@ -10,17 +9,16 @@
 // Company: BattleLine Productions LLC
 // Date: 07/20/2023
 // Project: Frontline CRM
-// File: ValidationType.cs
+// File: IDisposableValidator.cs
 // ---------------------------------------------------------------------------
-
 #endregion
 
-namespace AdvancedEmailValidator.Models;
+using AdvancedEmailValidator.Models;
+using System.Threading.Tasks;
 
-public enum ValidationType
+namespace AdvancedEmailValidator.Interfaces;
+
+public interface IDisposableValidator
 {
-    RegexValidation,
-    TypoValidation,
-    DisposableValidation,
-    MxValidation
+    Task<ValidationResult<DisposableValidationResult>> ValidateAsync(string email);
 }

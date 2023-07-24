@@ -1,5 +1,4 @@
 ﻿#region Copyright
-
 // ---------------------------------------------------------------------------
 // Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
 // 
@@ -8,19 +7,18 @@
 // 
 // Author: Michael Cavanaugh
 // Company: BattleLine Productions LLC
-// Date: 07/20/2023
+// Date: 07/23/2023
 // Project: Frontline CRM
-// File: ValidationType.cs
+// File: IFileReader.cs
 // ---------------------------------------------------------------------------
-
 #endregion
 
-namespace AdvancedEmailValidator.Models;
+using System.Threading.Tasks;
 
-public enum ValidationType
+namespace AdvancedEmailValidator.Interfaces;
+
+public interface IFileReader
 {
-    RegexValidation,
-    TypoValidation,
-    DisposableValidation,
-    MxValidation
+    Task<string[]> ReadAllLinesAsync(string path);
+    bool Exists(string path);
 }

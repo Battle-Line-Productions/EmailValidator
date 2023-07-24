@@ -1,82 +1,105 @@
-namespace AdvancedEmailValidator.Validators
+#region Copyright
+
+// ---------------------------------------------------------------------------
+// Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
+// 
+// Licensed under the BattleLine Productions LLC license agreement.
+// See LICENSE file in the project root for full license information.
+// 
+// Author: Michael Cavanaugh
+// Company: BattleLine Productions LLC
+// Date: 07/20/2023
+// Project: Frontline CRM
+// File: DnsValidator.cs
+// ---------------------------------------------------------------------------
+
+#endregion
+
+#region Usings
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using AdvancedEmailValidator.Extensions;
+using AdvancedEmailValidator.Interfaces;
+using AdvancedEmailValidator.Models;
+using DnsClient;
+using DnsClient.Protocol;
+
+#endregion
+
+namespace AdvancedEmailValidator.Validators;
+
+public class DnsValidator : IDnsValidator
 {
-    using System;
-    using System.Linq;
-    using DnsClient;
-    using DnsClient.Protocol;
-    using Extensions;
-    using Models;
+    private readonly ILookupClient _client;
+    private readonly ValidationOptions _options;
 
-    public class DnsValidator
+    public DnsValidator(ValidationOptions options)
     {
-        private readonly ILookupClient _client;
-        private readonly ValidationOptions _options;
+        _options = options ?? new ValidationOptions();
+        _client = new LookupClient();
+    }
 
+    public DnsValidator(ILookupClient client, ValidationOptions options)
+    {
+        _client = client ?? throw new ArgumentNullException(nameof(client));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
+    }
 
-        public DnsValidator(ValidationOptions options)
+    public async Task<ValidationResult<DnsValidationResult>> QueryAsync(string email)
+    {
+        var domain = email.GetEmailDomain();
+        IDnsQueryResponse lookupResult;
+
+        try
         {
-            _options = options ?? new ValidationOptions();
-            _client = new LookupClient();
+            lookupResult = await _client.QueryAsync(domain, QueryType.ANY);
         }
-        public DnsValidator(ILookupClient client, ValidationOptions options)
+        catch (Exception ex)
         {
-            _options = options ?? new ValidationOptions();
-            _client = client ?? new LookupClient();
-        }
-
-        public ValidationResult<DnsValidationResult> Query(string email)
-        {
-            var domain = email.GetEmailDomain();
-            IDnsQueryResponse lookupResult;
-
-            try
+            return new ValidationResult<DnsValidationResult>
             {
-                lookupResult = _client.Query(domain, QueryType.ANY);
-            }
-            catch
-            {
-                return new ValidationResult<DnsValidationResult>
-                {
-                    Message = "Unable to validate Dns Due to an Error",
-                    IsValid = false
-                };
-            }
-            
-            var aRecords = lookupResult.Answers.Where(x => x.RecordType == ResourceRecordType.A).ToList();
-            var mxRecords = lookupResult.Answers.Where(x => x.RecordType == ResourceRecordType.MX).ToList();
-            var allMxAndARecords = aRecords.Concat(mxRecords).ToList();
-
-            var response = new ValidationResult<DnsValidationResult>()
-            {
-                ValidationDetails = new DnsValidationResult
-                {
-                    RecordsFound = allMxAndARecords
-                }
+                Message = $"Unable to validate DNS due to an error: {ex.Message}",
+                IsValid = false
             };
+        }
 
-            if (!mxRecords.Any())
+        var aRecords = lookupResult.Answers.Where(x => x.RecordType == ResourceRecordType.A).ToList();
+        var mxRecords = lookupResult.Answers.Where(x => x.RecordType == ResourceRecordType.MX).ToList();
+        var allMxAndARecords = aRecords.Concat(mxRecords).ToList();
+
+        var response = new ValidationResult<DnsValidationResult>
+        {
+            ValidationDetails = new DnsValidationResult
             {
-                if (!aRecords.Any())
-                {
-                    response.Message = "Domain contains no DNS responses for A records or MX records";
-                    response.IsValid = false;
-                    return response;
-                }
-                response.Message =
-                    "Domain contains A record(s) but no Mx Record. While email send might work it can not be guaranteed";
-                if (_options.IsStrict)
-                {
-                    response.IsValid = false;
-                    return response;
-                }
+                RecordsFound = allMxAndARecords
+            }
+        };
 
-                response.IsValid = true;
+        if (!mxRecords.Any())
+        {
+            if (!aRecords.Any())
+            {
+                response.Message = "Domain contains no DNS responses for A records or MX records";
+                response.IsValid = false;
                 return response;
             }
 
-            response.Message = "Mx Record Exists";
+            response.Message =
+                "Domain contains A record(s) but no Mx Record. While email send might work it can not be guaranteed";
+            if (_options.IsStrict)
+            {
+                response.IsValid = false;
+                return response;
+            }
+
             response.IsValid = true;
             return response;
         }
+
+        response.Message = "Mx Record Exists";
+        response.IsValid = true;
+        return response;
     }
 }

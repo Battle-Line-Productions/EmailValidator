@@ -1,43 +1,86 @@
-namespace AdvancedEmailValidator
+#region Copyright
+
+// ---------------------------------------------------------------------------
+// Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
+// 
+// Licensed under the BattleLine Productions LLC license agreement.
+// See LICENSE file in the project root for full license information.
+// 
+// Author: Michael Cavanaugh
+// Company: BattleLine Productions LLC
+// Date: 07/20/2023
+// Project: Frontline CRM
+// File: EmailValidator.cs
+// ---------------------------------------------------------------------------
+
+#endregion
+
+#region Usings
+
+using AdvancedEmailValidator.Interfaces;
+using AdvancedEmailValidator.Models;
+using System.Threading.Tasks;
+
+#endregion
+
+namespace AdvancedEmailValidator;
+
+public class EmailValidator : IEmailValidator
 {
-    using System.Threading.Tasks;
-    using Models;
-    using Validators;
+    private readonly IDnsValidator _dnsValidator;
+    private readonly ITypoCheck _typoCheck;
+    private readonly IRegexValidator _regexValidator;
+    private readonly IDisposableValidator _disposableValidator;
 
-    public class EmailValidator
+    public EmailValidator(IDnsValidator dnsValidator, ITypoCheck typoCheck, IRegexValidator regexValidator, IDisposableValidator disposableValidator, IBuildDependencies buildDependencies)
     {
-        private readonly ValidationOptions _options;
+        _dnsValidator = dnsValidator;
+        _typoCheck = typoCheck;
+        _regexValidator = regexValidator;
+        _disposableValidator = disposableValidator;
 
-        public EmailValidator()
+        buildDependencies.CheckDependencies().GetAwaiter().GetResult();
+    }
+
+    public async Task<EmailValidationResult> ValidateAsync(string email, ValidationOptions options = null)
+    {
+        var validationResult = new EmailValidationResult();
+
+        options ??= new ValidationOptions
         {
-            _options = new ValidationOptions();
-            var dependencies = new BuildDependencies();
-            Task.Run(() => dependencies.CheckDependencies()).Wait();
+            IsStrict = true,
+            ValidateDisposable = true,
+            ValidateMx = true,
+            ValidateRegex = true,
+            ValidateSimpleRegex = true,
+            ValidateTypo = true
+        };
+
+        if (options.ValidateSimpleRegex)
+        {
+            validationResult.SimpleRegexResult = await _regexValidator.IsValidSimpleAsync(email);
         }
 
-        public EmailValidator(ValidationOptions options)
+        if (options.ValidateRegex)
         {
-            _options = options;
-            var dependencies = new BuildDependencies();
-            Task.Run(() => dependencies.CheckDependencies()).Wait(); 
+            validationResult.StandardRegexResult = await _regexValidator.IsValidAsync(email, options.CustomRegex);
         }
 
-        public (ValidationResult<RegexValidationResult>, 
-            ValidationResult<RegexValidationResult>,
-            ValidationResult<DnsValidationResult>, 
-            ValidationResult<DisposableValidationResult>, 
-            ValidationResult<TypoValidationResult>) Validate(string email)
+        if (options.ValidateMx)
         {
-            var dnsValidator = new DnsValidator(null, _options);
-            var typo = new TypoCheck(_options.TypoOptions);
-
-            var simpleRegexResult = _options.ValidateSimpleRegex ? RegexValidator.IsValidSimple(email) : null;
-            var standardRegexResult = _options.ValidateRegex ? RegexValidator.IsValid(email, _options.CustomRegex) : null;
-            var mxResult = _options.ValidateMx ? dnsValidator.Query(email) : null;
-            var disposableResult = _options.ValidateDisposable ? DisposableValidator.Validate(email) : null;
-            var typoResult = _options.ValidateTypo ? typo.Suggest(email) : null;
-
-            return (simpleRegexResult, standardRegexResult, mxResult, disposableResult, typoResult);
+            validationResult.MxResult = await _dnsValidator.QueryAsync(email);
         }
+
+        if (options.ValidateDisposable)
+        {
+            validationResult.DisposableResult = await _disposableValidator.ValidateAsync(email);
+        }
+
+        if (options.ValidateTypo)
+        {
+            validationResult.TypoResult = await _typoCheck.SuggestAsync(email);
+        }
+
+        return validationResult;
     }
 }

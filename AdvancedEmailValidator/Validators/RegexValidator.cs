@@ -1,79 +1,91 @@
-namespace AdvancedEmailValidator.Validators
+#region Copyright
+
+// ---------------------------------------------------------------------------
+// Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
+// 
+// Licensed under the BattleLine Productions LLC license agreement.
+// See LICENSE file in the project root for full license information.
+// 
+// Author: Michael Cavanaugh
+// Company: BattleLine Productions LLC
+// Date: 07/20/2023
+// Project: Frontline CRM
+// File: RegexValidator.cs
+// ---------------------------------------------------------------------------
+
+#endregion
+
+#region Usings
+
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using AdvancedEmailValidator.Interfaces;
+using AdvancedEmailValidator.Models;
+
+#endregion
+
+namespace AdvancedEmailValidator.Validators;
+
+public class RegexValidator : IRegexValidator
 {
-    using System.Text.RegularExpressions;
-    using Models;
+    private readonly Regex _regex =
+        new(@"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    public static class RegexValidator
+    private readonly Regex _simpleRegex = new("^[^\\s]+@[^\\s]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    public Task<ValidationResult<RegexValidationResult>> IsValidSimpleAsync(string email)
     {
-        private static readonly Regex SimpleRegex = new("^[^\\s]+@[^\\s]+$", RegexOptions.IgnoreCase);
+        var match = _simpleRegex.Match(email);
 
-        private static readonly Regex Regex =
-            new(@"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", RegexOptions.IgnoreCase);
-
-        /// <summary>
-        /// Performs a very simple regex validation on email strings checking for the following
-        /// 1. At least one @ Sign
-        /// 2. At least one non-whitespace character before the @ sign
-        /// 3. At least one non-whitespace character after the @ sign
-        /// </summary>
-        /// <param name="email">the string to validate as an email</param>
-        /// <returns><see cref="ValidationResult&lt;RegexValidationResult&gt;"/> containing a validation message and a boolean isValid</returns>
-        public static ValidationResult<RegexValidationResult> IsValidSimple(string email)
-        {
-            var match = SimpleRegex.Match(email);
-
-
-            return match.Success
-                ? new ValidationResult<RegexValidationResult>
+        var result = match.Success
+            ? new ValidationResult<RegexValidationResult>
+            {
+                IsValid = true,
+                Message = "Valid Email",
+                ValidationDetails = new RegexValidationResult
                 {
-                    IsValid = true,
-                    Message = "Valid Email",
-                    ValidationDetails = new RegexValidationResult
-                    {
-                        Captures = match.Captures
-                    }
+                    Captures = match.Captures
                 }
-                : new ValidationResult<RegexValidationResult>
+            }
+            : new ValidationResult<RegexValidationResult>
+            {
+                IsValid = false,
+                Message = "Email did not pass regex Validation",
+                ValidationDetails = new RegexValidationResult
                 {
-                    IsValid = false,
-                    Message = "Email did not pass regex Validation",
-                    ValidationDetails = new RegexValidationResult
-                    {
-                        Captures = match.Captures
-                    }
-                };
-        }
-
-        /// <summary>
-        /// Performs a regex validation or a custom regex defined by consumer
-        /// </summary>
-        /// <param name="email">the string to validate as an email</param>
-        /// <param name="customRegex">The the custom regex option injected by the consumer to define how email validation should occur</param>
-        /// <returns><see cref="ValidationResult&lt;RegexValidationResult&gt;"/> containing a validation message and a boolean isValid</returns>
-        public static ValidationResult<RegexValidationResult> IsValid(string email, Regex customRegex = null)
-        {
-            var regex = customRegex ?? Regex;
-            
-            var match = regex.Match(email);
-            return match.Success
-                ? new ValidationResult<RegexValidationResult>
-                {
-                    IsValid = true,
-                    Message = "Valid Email",
-                    ValidationDetails = new RegexValidationResult
-                    {
-                        Captures = match.Captures
-                    }
+                    Captures = match.Captures
                 }
-                : new ValidationResult<RegexValidationResult>
+            };
+
+        return Task.FromResult(result);
+    }
+
+    public Task<ValidationResult<RegexValidationResult>> IsValidAsync(string email, Regex customRegex)
+    {
+        var regex = customRegex ?? _regex;
+
+        var match = regex.Match(email);
+        var result = match.Success
+            ? new ValidationResult<RegexValidationResult>
+            {
+                IsValid = true,
+                Message = "Valid Email",
+                ValidationDetails = new RegexValidationResult
                 {
-                    IsValid = false,
-                    Message = "Email did not pass regex Validation",
-                    ValidationDetails = new RegexValidationResult
-                    {
-                        Captures = match.Captures
-                    }
-                };
-        }
+                    Captures = match.Captures
+                }
+            }
+            : new ValidationResult<RegexValidationResult>
+            {
+                IsValid = false,
+                Message = "Email did not pass regex Validation",
+                ValidationDetails = new RegexValidationResult
+                {
+                    Captures = match.Captures
+                }
+            };
+
+        return Task.FromResult(result);
     }
 }
