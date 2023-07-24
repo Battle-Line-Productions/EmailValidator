@@ -20,5 +20,5 @@ namespace AdvancedEmailValidator.Interfaces;
 
 public interface IEmailValidator
 {
-    Task<EmailValidationResult> ValidateAsync(string email);
+    Task<EmailValidationResult> ValidateAsync(string email, ValidationOptions options = null);
 }

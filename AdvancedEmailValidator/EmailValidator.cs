@@ -27,7 +27,6 @@ namespace AdvancedEmailValidator;
 
 public class EmailValidator : IEmailValidator
 {
-    private readonly ValidationOptions _options;
     private readonly IDnsValidator _dnsValidator;
     private readonly ITypoCheck _typoCheck;
     private readonly IRegexValidator _regexValidator;
@@ -35,7 +34,6 @@ public class EmailValidator : IEmailValidator
 
     public EmailValidator(IDnsValidator dnsValidator, ITypoCheck typoCheck, IRegexValidator regexValidator, IDisposableValidator disposableValidator, IBuildDependencies buildDependencies)
     {
-        _options = new ValidationOptions();
         _dnsValidator = dnsValidator;
         _typoCheck = typoCheck;
         _regexValidator = regexValidator;
@@ -44,42 +42,41 @@ public class EmailValidator : IEmailValidator
         buildDependencies.CheckDependencies().GetAwaiter().GetResult();
     }
 
-    public EmailValidator(ValidationOptions options, IDnsValidator dnsValidator, ITypoCheck typoCheck, IRegexValidator regexValidator, IDisposableValidator disposableValidator, IBuildDependencies buildDependencies)
-    {
-        _options = options;
-        _dnsValidator = dnsValidator;
-        _typoCheck = typoCheck;
-        _regexValidator = regexValidator;
-        _disposableValidator = disposableValidator;
-
-        buildDependencies.CheckDependencies().GetAwaiter().GetResult();
-    }
-
-    public async Task<EmailValidationResult> ValidateAsync(string email)
+    public async Task<EmailValidationResult> ValidateAsync(string email, ValidationOptions options = null)
     {
         var validationResult = new EmailValidationResult();
 
-        if (_options.ValidateSimpleRegex)
+        options ??= new ValidationOptions
+        {
+            IsStrict = true,
+            ValidateDisposable = true,
+            ValidateMx = true,
+            ValidateRegex = true,
+            ValidateSimpleRegex = true,
+            ValidateTypo = true
+        };
+
+        if (options.ValidateSimpleRegex)
         {
             validationResult.SimpleRegexResult = await _regexValidator.IsValidSimpleAsync(email);
         }
 
-        if (_options.ValidateRegex)
+        if (options.ValidateRegex)
         {
-            validationResult.StandardRegexResult = await _regexValidator.IsValidAsync(email, _options.CustomRegex);
+            validationResult.StandardRegexResult = await _regexValidator.IsValidAsync(email, options.CustomRegex);
         }
 
-        if (_options.ValidateMx)
+        if (options.ValidateMx)
         {
             validationResult.MxResult = await _dnsValidator.QueryAsync(email);
         }
 
-        if (_options.ValidateDisposable)
+        if (options.ValidateDisposable)
         {
             validationResult.DisposableResult = await _disposableValidator.ValidateAsync(email);
         }
 
-        if (_options.ValidateTypo)
+        if (options.ValidateTypo)
         {
             validationResult.TypoResult = await _typoCheck.SuggestAsync(email);
         }
