@@ -3,9 +3,10 @@
   <PropertyGroup>
     <AssemblyName>AdvancedEmailValidator</AssemblyName>
     <ProjectGuid>FAE04EC0-301F-11D3-BF4B-00C04F79EFBC</ProjectGuid>
-    <Version>1.0.0</Version>
+    <Version>2.0.1</Version>
     <RootNamespace>AdvancedEmailValidator</RootNamespace>
     <SignAssembly Condition="'$(ShouldSignAssembly)' == 'true'">true</SignAssembly>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
     <PropertyGroup>
@@ -14,7 +15,7 @@
         <Title>Advanced Email Validator</Title>
         <Authors>Michael Cavanaugh</Authors>
         <Description>Package allows for easy email validation. Includes the ability to validate email by Regex, check email's against a list of disposable email domains, validate if the email domain has an MX Record to receive email, and checks the email for typo's and then provides a suggested email if it feel it is typed wrong</Description>
-        <Copyright>2021</Copyright>
+        <Copyright>2023</Copyright>
         <PackageProjectUrl>https://github.com/Battle-Line-Productions/EmailValidator</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Battle-Line-Productions/EmailValidator</RepositoryUrl>
         <RepositoryType>github</RepositoryType>
@@ -42,6 +43,10 @@
 
     <ItemGroup>
       <Folder Include="Interfaces\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="README.md" Pack="true" PackagePath="" />
     </ItemGroup>
 
 </Project>
