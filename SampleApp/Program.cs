@@ -18,32 +18,61 @@
 #region Usings
 
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using AdvancedEmailValidator;
+using AdvancedEmailValidator.Interfaces;
 using AdvancedEmailValidator.Models;
+using AdvancedEmailValidator.Validators;
+using Microsoft.Extensions.Http;
 
 #endregion
 
 namespace SampleApp;
 
+public class SimpleHttpClientFactory : IHttpClientFactory
+{
+    public HttpClient CreateClient(string name)
+    {
+        return new HttpClient();
+    }
+}
+
 internal static class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
-        var options = new ValidationOptions
+        IBuildDependencies buildDependencies = new BuildDependencies(new SimpleHttpClientFactory());
+        buildDependencies.CheckDependencies().GetAwaiter().GetResult();
+
+        var validationOptions = new ValidationOptions();
+
+        IDnsValidator dnsValidator = new DnsValidator(validationOptions);
+        ITypoCheck typoCheck = new TypoCheck(validationOptions.TypoOptions);
+        IRegexValidator regexValidator = new RegexValidator();
+        IFileReader fileReader = new FileReader();
+        IDisposableValidator disposableValidator = new DisposableValidator(fileReader);
+        
+        var emailValidator = new EmailValidator(dnsValidator, typoCheck, regexValidator, disposableValidator, buildDependencies);
+
+        string emailToValidate;
+        string userInput;
+
+        do
         {
-            ValidateSimpleRegex = true,
-            IsStrict = true,
-            ValidateRegex = true,
-            ValidateMx = true,
-            ValidateDisposable = true,
-            ValidateTypo = true
-        };
+            Console.WriteLine("Please enter an email to validate:");
+            emailToValidate = Console.ReadLine();
 
-        //var validator = new EmailValidator(options);
+            var validationResult = await emailValidator.ValidateAsync(emailToValidate);
 
-        //var result = validator.Validate("funkel1989@gmail.com");
+            Console.WriteLine($"Validation result for email '{emailToValidate}':");
+            Console.WriteLine("Simple Regex Result: " + (validationResult.SimpleRegexResult?.IsValid ?? false));
+            Console.WriteLine("Standard Regex Result: " + (validationResult.StandardRegexResult?.IsValid ?? false));
 
-        //Console.WriteLine(result.ToString());
-        Console.ReadLine();
+            Console.WriteLine("Do you want to validate another email? Press '1' to validate another email, '2' to exit.");
+            userInput = Console.ReadLine();
+
+        } while (userInput == "1");
     }
+
 }
