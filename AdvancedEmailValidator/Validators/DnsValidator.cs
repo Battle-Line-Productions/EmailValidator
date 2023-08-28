@@ -33,21 +33,18 @@ namespace AdvancedEmailValidator.Validators;
 public class DnsValidator : IDnsValidator
 {
     private readonly ILookupClient _client;
-    private readonly ValidationOptions _options;
 
-    public DnsValidator(ValidationOptions options)
+    public DnsValidator()
     {
-        _options = options ?? new ValidationOptions();
         _client = new LookupClient();
     }
 
-    public DnsValidator(ILookupClient client, ValidationOptions options)
+    public DnsValidator(ILookupClient client)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
-        _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
-    public async Task<ValidationResult<DnsValidationResult>> QueryAsync(string email)
+    public async Task<ValidationResult<DnsValidationResult>> QueryAsync(string email, bool isStrict = false)
     {
         var domain = email.GetEmailDomain();
         IDnsQueryResponse lookupResult;
@@ -77,6 +74,15 @@ public class DnsValidator : IDnsValidator
             }
         };
 
+        if (lookupResult.HasError)
+        {
+            response.Message = $"Unable to validate due to DNS Error: {lookupResult.ErrorMessage}";
+
+            response.IsValid = !isStrict;
+
+            return response;
+        }
+
         if (!mxRecords.Any())
         {
             if (!aRecords.Any())
@@ -88,7 +94,7 @@ public class DnsValidator : IDnsValidator
 
             response.Message =
                 "Domain contains A record(s) but no Mx Record. While email send might work it can not be guaranteed";
-            if (_options.IsStrict)
+            if (isStrict)
             {
                 response.IsValid = false;
                 return response;

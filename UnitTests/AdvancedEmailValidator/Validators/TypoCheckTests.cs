@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AdvancedEmailValidator.Models;
 using AdvancedEmailValidator.Validators;
 using Xunit;
 
@@ -38,14 +37,7 @@ public class TypoCheckTests
         var secondLevelDomains = new List<string> { "yahoo", "hotmail", "mail", "live", "outlook", "gmx" };
         var topLevelDomains = new List<string> { "co.uk", "com", "org", "info", "fr" };
 
-        var typoOptions = new TypoOptions
-        {
-            Domains = domains,
-            SecondLevelDomains = secondLevelDomains,
-            TopLevelDomains = topLevelDomains
-        };
-
-        _typoCheck = new TypoCheck(typoOptions);
+        _typoCheck = new TypoCheck();
     }
 
     [Fact]

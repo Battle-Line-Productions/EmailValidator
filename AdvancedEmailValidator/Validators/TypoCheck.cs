@@ -30,7 +30,7 @@ namespace AdvancedEmailValidator.Validators;
 
 public class TypoCheck : ITypoCheck
 {
-    private readonly List<string> _domains = new()
+    private List<string> _domains = new()
     {
         "msn.com", "bellsouth.net", "telus.net", "comcast.net", "optusnet.com.au", "earthlink.net", "qq.com",
         "sky.com", "icloud.com", "mac.com", "sympatico.ca", "googlemail.com", "att.net", "xtra.co.nz", "web.de",
@@ -38,25 +38,28 @@ public class TypoCheck : ITypoCheck
         "optonline.net", "sbcglobal.net", "aol.com", "me.com", "btinternet.com", "charter.net", "shaw.ca"
     };
 
-    private readonly int _domainThreshold = 2;
+    private int _domainThreshold = 2;
 
-    private readonly List<string> _secondLevelDomains =
+    private List<string> _secondLevelDomains =
         new() { "yahoo", "hotmail", "mail", "live", "outlook", "gmx" };
 
-    private readonly int _secondLevelThreshold = 2;
+    private int _secondLevelThreshold = 2;
 
-    private readonly List<string> _topLevelDomains = new()
+    private List<string> _topLevelDomains = new()
     {
         "com", "com.au", "com.tw", "ca", "co.nz", "co.uk", "de", "fr", "it", "ru", "net", "org", "edu", "gov", "jp",
         "nl", "kr", "se", "eu", "ie", "co.il", "us", "at", "be", "dk", "hk", "es", "gr", "ch", "no", "cz", "in",
         "net", "net.au", "info", "biz", "mil", "co.jp", "sg", "hu", "uk"
     };
 
-    private readonly int _topLevelThreshold = 2;
+    private int _topLevelThreshold = 2;
 
     private const int DefaultMaxOffset = 5;
 
-    public TypoCheck(TypoOptions options)
+    public TypoCheck()
+    { }
+
+    private void InitOptions(TypoOptions options)
     {
         _domains ??= options?.Domains ?? _domains;
         _secondLevelDomains ??= options?.SecondLevelDomains ?? _secondLevelDomains;
@@ -66,8 +69,10 @@ public class TypoCheck : ITypoCheck
         _topLevelThreshold = options?.TopLevelThreshold ?? _topLevelThreshold;
     }
 
-    public Task<ValidationResult<TypoValidationResult>> SuggestAsync(string email)
+    public Task<ValidationResult<TypoValidationResult>> SuggestAsync(string email, TypoOptions options = null)
     {
+        InitOptions(options);
+
         email = email.ToLower();
 
         var (topLevelDomain, secondLevelDomain, domain, localPart, _) = email.SplitEmail();

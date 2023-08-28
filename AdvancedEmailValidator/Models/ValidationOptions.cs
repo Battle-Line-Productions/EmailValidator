@@ -34,7 +34,7 @@ public class ValidationOptions
     ///     Validates email against a simple regex string
     ///     Checks for @ sign and dot after at sign
     /// </summary>
-    public bool ValidateSimpleRegex { get; set; } = true;
+    public bool ValidateSimpleRegex { get; set; } = false;
 
     /// <summary>
     ///     Will Validate the email being checked has a valid mx record on the domain
@@ -62,7 +62,7 @@ public class ValidationOptions
     ///     Example: MX record is missing but A record exists would return false for IsValid even though spec says email might
     ///     still send.
     /// </summary>
-    public bool IsStrict { get; set; } = true;
+    public bool IsStrict { get; set; } = false;
 
     /// <summary>
     ///     A set of options used to determine how the typo functionality works

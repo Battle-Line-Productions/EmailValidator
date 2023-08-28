@@ -35,8 +35,8 @@ public class EmailValidatorTests
 
     public EmailValidatorTests()
     {
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(A<string>.Ignored)).Returns(Task.FromResult(new ValidationResult<DnsValidationResult>()));
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(A<string>.Ignored)).Returns(Task.FromResult(new ValidationResult<TypoValidationResult> { ValidationDetails = new TypoValidationResult() }));
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(A<string>.Ignored, A<bool>.Ignored)).Returns(Task.FromResult(new ValidationResult<DnsValidationResult>()));
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(A<string>.Ignored, A<TypoOptions>._)).Returns(Task.FromResult(new ValidationResult<TypoValidationResult> { ValidationDetails = new TypoValidationResult() }));
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(A<string>.Ignored)).Returns(Task.FromResult(new ValidationResult<RegexValidationResult>()));
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(A<string>.Ignored, A<Regex>.Ignored)).Returns(Task.FromResult(new ValidationResult<RegexValidationResult>()));
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(A<string>.Ignored)).Returns(Task.FromResult(new ValidationResult<DisposableValidationResult>()));
@@ -60,8 +60,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, true)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustHaveHappenedOnceExactly();
@@ -84,8 +84,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustNotHaveHappened();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustNotHaveHappened();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, false)).MustNotHaveHappened();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustNotHaveHappened();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustNotHaveHappened();
@@ -108,8 +108,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustNotHaveHappened();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, true)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustNotHaveHappened();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustNotHaveHappened();
@@ -132,8 +132,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustNotHaveHappened();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustNotHaveHappened();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, false)).MustNotHaveHappened();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustNotHaveHappened();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustHaveHappenedOnceExactly();
@@ -156,8 +156,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustNotHaveHappened();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustNotHaveHappened();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, false)).MustNotHaveHappened();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustNotHaveHappened();
@@ -180,8 +180,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustNotHaveHappened();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustNotHaveHappened();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, false)).MustNotHaveHappened();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustNotHaveHappened();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustNotHaveHappened();
@@ -204,8 +204,8 @@ public class EmailValidatorTests
 
         var result = await emailValidator.ValidateAsync(TestEmail, options);
 
-        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail)).MustNotHaveHappened();
-        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _fakeDnsValidator.QueryAsync(TestEmail, false)).MustNotHaveHappened();
+        A.CallTo(() => _fakeTypoCheck.SuggestAsync(TestEmail, A<TypoOptions>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _fakeRegexValidator.IsValidSimpleAsync(TestEmail)).MustNotHaveHappened();
         A.CallTo(() => _fakeRegexValidator.IsValidAsync(TestEmail, A<Regex>.Ignored)).MustNotHaveHappened();
         A.CallTo(() => _fakeDisposableValidator.ValidateAsync(TestEmail)).MustNotHaveHappened();

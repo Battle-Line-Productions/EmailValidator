@@ -23,10 +23,13 @@ namespace AdvancedEmailValidator;
 
 public static class EmailValidatorServiceCollectionExtensions
 {
+    private const string DisposableEmailClientName = "DisposableEmailClient";
+
     public static IServiceCollection AddEmailValidator(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         // ILookupClient should always be Singleton
         services.AddSingleton<ILookupClient, LookupClient>();
+        services.AddHttpClient(DisposableEmailClientName);
 
         // Add other services
         AddService<IFileReader, FileReader>(services, lifetime);

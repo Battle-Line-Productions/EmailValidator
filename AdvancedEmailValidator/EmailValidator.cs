@@ -48,11 +48,11 @@ public class EmailValidator : IEmailValidator
 
         options ??= new ValidationOptions
         {
-            IsStrict = true,
+            IsStrict = false,
             ValidateDisposable = true,
             ValidateMx = true,
             ValidateRegex = true,
-            ValidateSimpleRegex = true,
+            ValidateSimpleRegex = false,
             ValidateTypo = true
         };
 
@@ -68,7 +68,7 @@ public class EmailValidator : IEmailValidator
 
         if (options.ValidateMx)
         {
-            validationResult.MxResult = await _dnsValidator.QueryAsync(email);
+            validationResult.MxResult = await _dnsValidator.QueryAsync(email, options.IsStrict);
         }
 
         if (options.ValidateDisposable)
@@ -78,7 +78,7 @@ public class EmailValidator : IEmailValidator
 
         if (options.ValidateTypo)
         {
-            validationResult.TypoResult = await _typoCheck.SuggestAsync(email);
+            validationResult.TypoResult = await _typoCheck.SuggestAsync(email, options.TypoOptions);
         }
 
         return validationResult;
