@@ -45,10 +45,8 @@ internal static class Program
         IBuildDependencies buildDependencies = new BuildDependencies(new SimpleHttpClientFactory());
         buildDependencies.CheckDependencies().GetAwaiter().GetResult();
 
-        var validationOptions = new ValidationOptions();
-
-        IDnsValidator dnsValidator = new DnsValidator(validationOptions);
-        ITypoCheck typoCheck = new TypoCheck(validationOptions.TypoOptions);
+        IDnsValidator dnsValidator = new DnsValidator();
+        ITypoCheck typoCheck = new TypoCheck();
         IRegexValidator regexValidator = new RegexValidator();
         IFileReader fileReader = new FileReader();
         IDisposableValidator disposableValidator = new DisposableValidator(fileReader);

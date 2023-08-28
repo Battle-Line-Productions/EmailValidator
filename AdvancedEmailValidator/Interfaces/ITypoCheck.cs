@@ -20,5 +20,5 @@ namespace AdvancedEmailValidator.Interfaces;
 
 public interface ITypoCheck
 {
-    Task<ValidationResult<TypoValidationResult>> SuggestAsync(string email);
+    Task<ValidationResult<TypoValidationResult>> SuggestAsync(string email, TypoOptions options = null);
 }

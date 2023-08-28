@@ -20,5 +20,5 @@ namespace AdvancedEmailValidator.Interfaces;
 
 public interface IDnsValidator
 {
-    Task<ValidationResult<DnsValidationResult>> QueryAsync(string email);
+    Task<ValidationResult<DnsValidationResult>> QueryAsync(string email, bool isStrict = false);
 }

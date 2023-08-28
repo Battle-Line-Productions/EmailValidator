@@ -32,6 +32,8 @@ public class BuildDependencies : IBuildDependencies
     private const string DisposableEmailDomainUri =
         "https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf";
 
+    private const string DisposableEmailClientName = "DisposableEmailClient";
+
     private static readonly string DisposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
 
     private readonly IHttpClientFactory _httpClientFactory;
@@ -63,7 +65,7 @@ public class BuildDependencies : IBuildDependencies
 
     private async Task DownloadDisposableEmailFile()
     {
-        var client = _httpClientFactory.CreateClient();
+        var client = _httpClientFactory.CreateClient(DisposableEmailClientName);
 
         HttpResponseMessage result;
 
