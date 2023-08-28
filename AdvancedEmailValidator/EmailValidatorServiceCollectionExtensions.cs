@@ -17,23 +17,46 @@ using AdvancedEmailValidator.Interfaces;
 using AdvancedEmailValidator.Validators;
 using DnsClient;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AdvancedEmailValidator;
 
 public static class EmailValidatorServiceCollectionExtensions
 {
-    public static IServiceCollection AddEmailValidator(this IServiceCollection services)
+    public static IServiceCollection AddEmailValidator(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
+        // ILookupClient should always be Singleton
         services.AddSingleton<ILookupClient, LookupClient>();
 
-        services.AddScoped<IFileReader, FileReader>();
-        services.AddScoped<IBuildDependencies, BuildDependencies>();
-        services.AddScoped<IDnsValidator, DnsValidator>();
-        services.AddScoped<ITypoCheck, TypoCheck>();
-        services.AddScoped<IRegexValidator, RegexValidator>();
-        services.AddScoped<IDisposableValidator, DisposableValidator>();
-        services.AddScoped<IEmailValidator, EmailValidator>();
+        // Add other services
+        AddService<IFileReader, FileReader>(services, lifetime);
+        AddService<IBuildDependencies, BuildDependencies>(services, lifetime);
+        AddService<IDnsValidator, DnsValidator>(services, lifetime);
+        AddService<ITypoCheck, TypoCheck>(services, lifetime);
+        AddService<IRegexValidator, RegexValidator>(services, lifetime);
+        AddService<IDisposableValidator, DisposableValidator>(services, lifetime);
+        AddService<IEmailValidator, EmailValidator>(services, lifetime);
 
         return services;
+    }
+
+    private static void AddService<TService, TImplementation>(IServiceCollection services, ServiceLifetime lifetime)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                services.AddSingleton<TService, TImplementation>();
+                break;
+            case ServiceLifetime.Scoped:
+                services.AddScoped<TService, TImplementation>();
+                break;
+            case ServiceLifetime.Transient:
+                services.AddTransient<TService, TImplementation>();
+                break;
+            default:
+                throw new ArgumentException("Invalid service lifetime specified.");
+        }
     }
 }
