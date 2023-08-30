@@ -23,7 +23,7 @@
         <Company>BattleLine Productions</Company>
         <Product>Advanced Email Validator</Product>
         <NeutralLanguage>en-US</NeutralLanguage>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
@@ -37,8 +37,16 @@
 
     <ItemGroup>
       <PackageReference Include="DnsClient" Version="1.7.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
