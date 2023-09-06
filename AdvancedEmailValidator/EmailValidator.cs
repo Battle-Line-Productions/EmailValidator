@@ -9,7 +9,7 @@
 // Author: Michael Cavanaugh
 // Company: BattleLine Productions LLC
 // Date: 07/20/2023
-// Project: Frontline CRM
+// Project: Advanced Email Validator
 // File: EmailValidator.cs
 // ---------------------------------------------------------------------------
 
