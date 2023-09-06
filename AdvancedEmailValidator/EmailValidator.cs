@@ -31,6 +31,7 @@ public class EmailValidator : IEmailValidator
     private readonly ITypoCheck _typoCheck;
     private readonly IRegexValidator _regexValidator;
     private readonly IDisposableValidator _disposableValidator;
+    private readonly IBuildDependencies _buildDependencies;
 
     public EmailValidator(IDnsValidator dnsValidator, ITypoCheck typoCheck, IRegexValidator regexValidator, IDisposableValidator disposableValidator, IBuildDependencies buildDependencies)
     {
@@ -38,12 +39,13 @@ public class EmailValidator : IEmailValidator
         _typoCheck = typoCheck;
         _regexValidator = regexValidator;
         _disposableValidator = disposableValidator;
-
-        buildDependencies.CheckDependencies().GetAwaiter().GetResult();
+        _buildDependencies = buildDependencies;
     }
 
     public async Task<EmailValidationResult> ValidateAsync(string email, ValidationOptions options = null)
     {
+        await _buildDependencies.CheckDependencies();
+
         var validationResult = new EmailValidationResult();
 
         options ??= new ValidationOptions

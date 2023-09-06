@@ -34,11 +34,11 @@ public static class EmailValidatorServiceCollectionExtensions
         // Add other services
         AddService<IFileReader, FileReader>(services, lifetime);
         AddService<IBuildDependencies, BuildDependencies>(services, lifetime);
+        AddService<IEmailValidator, EmailValidator>(services, lifetime);
         AddService<IDnsValidator, DnsValidator>(services, lifetime);
         AddService<ITypoCheck, TypoCheck>(services, lifetime);
         AddService<IRegexValidator, RegexValidator>(services, lifetime);
         AddService<IDisposableValidator, DisposableValidator>(services, lifetime);
-        AddService<IEmailValidator, EmailValidator>(services, lifetime);
 
         return services;
     }

@@ -33,15 +33,9 @@ public class DisposableValidator : IDisposableValidator
     private readonly IFileReader _fileReader;
     private readonly string _disposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
 
-
     public DisposableValidator(IFileReader fileReader)
     {
         _fileReader = fileReader;
-
-        if (!_fileReader.Exists(_disposableEmailFile))
-        {
-            throw new FileNotFoundException(nameof(_disposableEmailFile));
-        }
     }
 
     public async Task<ValidationResult<DisposableValidationResult>> ValidateAsync(string email)

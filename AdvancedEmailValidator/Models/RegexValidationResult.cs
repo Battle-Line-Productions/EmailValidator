@@ -17,6 +17,9 @@
 
 #region Usings
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 #endregion
@@ -25,5 +28,22 @@ namespace AdvancedEmailValidator.Models;
 
 public class RegexValidationResult
 {
+    [JsonIgnore] // We are ignoring this property during serialization
     public CaptureCollection Captures { get; set; }
+
+    public List<string> SerializableCaptures
+    {
+        get
+        {
+            var serializableCaptures = new List<string>();
+
+            if (Captures != null)
+            {
+                serializableCaptures.AddRange(Captures.Select(capture => capture.Value));
+            }
+
+            return serializableCaptures;
+        }
+        
+    }
 }

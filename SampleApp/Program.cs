@@ -22,9 +22,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AdvancedEmailValidator;
 using AdvancedEmailValidator.Interfaces;
-using AdvancedEmailValidator.Models;
 using AdvancedEmailValidator.Validators;
-using Microsoft.Extensions.Http;
 
 #endregion
 
