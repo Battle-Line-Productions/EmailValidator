@@ -1,31 +1,9 @@
-#region Copyright
-
-// ---------------------------------------------------------------------------
-// Copyright (c) 2023 BattleLine Productions LLC. All rights reserved.
-// 
-// Licensed under the BattleLine Productions LLC license agreement.
-// See LICENSE file in the project root for full license information.
-// 
-// Author: Michael Cavanaugh
-// Company: BattleLine Productions LLC
-// Date: 07/20/2023
-// Project: Frontline CRM
-// File: BuildDependencies.cs
-// ---------------------------------------------------------------------------
-
-#endregion
-
-#region Usings
-
-using AdvancedEmailValidator.Interfaces;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-
-#endregion
-
-namespace AdvancedEmailValidator;
+using AdvancedEmailValidator.Interfaces;
 
 public class BuildDependencies : IBuildDependencies
 {
@@ -37,6 +15,7 @@ public class BuildDependencies : IBuildDependencies
     private static readonly string DisposableEmailFile = $"{Path.GetTempPath()}disposable_email_blocklist.conf";
 
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);  // Initial count and maximum count of 1.
 
     public BuildDependencies(IHttpClientFactory httpClientFactory)
     {
@@ -50,16 +29,25 @@ public class BuildDependencies : IBuildDependencies
 
     private async Task CheckDisposableFile()
     {
-        if (!File.Exists(DisposableEmailFile))
-        {
-            await DownloadDisposableEmailFile();
-            return;
-        }
+        await _semaphore.WaitAsync();  // Wait until it's safe to enter.
 
-        var threshold = DateTime.UtcNow.AddDays(-1);
-        if (File.GetLastWriteTimeUtc(DisposableEmailFile) > threshold)
+        try
         {
-            await DownloadDisposableEmailFile();
+            if (!File.Exists(DisposableEmailFile))
+            {
+                await DownloadDisposableEmailFile();
+                return;
+            }
+
+            var threshold = DateTime.UtcNow.AddDays(-1);
+            if (File.GetLastWriteTimeUtc(DisposableEmailFile) > threshold)
+            {
+                await DownloadDisposableEmailFile();
+            }
+        }
+        finally
+        {
+            _semaphore.Release();  // Release the semaphore to allow other threads to enter.
         }
     }
 
