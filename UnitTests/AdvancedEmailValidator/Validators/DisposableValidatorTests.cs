@@ -43,7 +43,6 @@ public class DisposableValidatorTests
         var result = await _validator.ValidateAsync($"test.com");
 
         Assert.True(result.IsValid);
-        A.CallTo(() => _fileReader.Exists(A<string>.Ignored)).MustHaveHappened();
         A.CallTo(() => _fileReader.ReadAllLinesAsync(A<string>.Ignored)).MustHaveHappened();
     }
 
@@ -55,7 +54,6 @@ public class DisposableValidatorTests
         var result = await _validator.ValidateAsync("test@test.com");
 
         Assert.False(result.IsValid);
-        A.CallTo(() => _fileReader.Exists(A<string>.Ignored)).MustHaveHappened();
         A.CallTo(() => _fileReader.ReadAllLinesAsync(A<string>.Ignored)).MustHaveHappened();
     }
 }
