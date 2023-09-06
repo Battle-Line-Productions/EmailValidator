@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>AdvancedEmailValidator</AssemblyName>
     <ProjectGuid>FAE04EC0-301F-11D3-BF4B-00C04F79EFBC</ProjectGuid>
-    <Version>2.1.0</Version>
+    <Version>2.2.1</Version>
     <RootNamespace>AdvancedEmailValidator</RootNamespace>
     <SignAssembly Condition="'$(ShouldSignAssembly)' == 'true'">true</SignAssembly>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -20,7 +20,7 @@
         <RepositoryUrl>https://github.com/Battle-Line-Productions/EmailValidator</RepositoryUrl>
         <RepositoryType>github</RepositoryType>
         <PackageTags>email validator validation typo disposable dns mx record</PackageTags>
-        <Company>BattleLine Productions</Company>
+        <Company>Battleline Productions</Company>
         <Product>Advanced Email Validator</Product>
         <NeutralLanguage>en-US</NeutralLanguage>
         <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
