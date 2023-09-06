@@ -44,8 +44,6 @@ public class EmailValidator : IEmailValidator
 
     public async Task<EmailValidationResult> ValidateAsync(string email, ValidationOptions options = null)
     {
-        await _buildDependencies.CheckDependencies();
-
         var validationResult = new EmailValidationResult();
 
         options ??= new ValidationOptions
@@ -75,6 +73,8 @@ public class EmailValidator : IEmailValidator
 
         if (options.ValidateDisposable)
         {
+            await _buildDependencies.CheckDependencies();
+
             validationResult.DisposableResult = await _disposableValidator.ValidateAsync(email);
         }
 
